@@ -10,10 +10,15 @@ import os
 from PIL import Image
 from sklearn.preprocessing import LabelEncoder
 
-# Define the output folder
-output_folder = r'C:\Users\eefie\PycharmProjects\DesignProject\Plots_Categories'
-png_file_path = r"C:\Users\eefie\PycharmProjects\DesignProject\Data\ProRail logo.png"
-logo = Image.open(png_file_path)
+# Define file paths using relative paths
+file_path = 'Template_V03 (1).xlsx'
+logo_path = 'ProRail logo.png'
+
+# Load the data from the template
+df = pd.read_excel(file_path, sheet_name='Template')
+
+# Load and display the ProRail logo
+logo = Image.open(logo_path)
 
 # Display the logo in the sidebar
 st.sidebar.image(logo, use_column_width=True)
