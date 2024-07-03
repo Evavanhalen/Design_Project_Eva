@@ -9,6 +9,7 @@ import streamlit as st
 import os
 from PIL import Image
 from sklearn.preprocessing import LabelEncoder
+from io import BytesIO
 
 # Define file paths using relative paths
 file_path = 'Template_V03 (1).xlsx'
@@ -98,7 +99,7 @@ summary_non_numerical = mode_non_numerical
 summary_std = grouped_stds
 
 # Define the function to plot all numerical features
-def plot_all_numerical_features(mean_values, std_values, categories, output_folder, group_size=6):
+def plot_all_numerical_features(mean_values, std_values, categories, group_size=6):
     numerical_features = mean_values.columns
     num_features = len(numerical_features)
     cols = 2  # Number of columns for subplots
@@ -128,11 +129,8 @@ def plot_all_numerical_features(mean_values, std_values, categories, output_fold
         plt.tight_layout(pad=3.1)
         fig.subplots_adjust(top=0.9)
         fig.suptitle(f'Means of Numerical Features from {start_idx + 1} to {end_idx} by Urban/Regional/Suburban Category', fontsize=16)
-        fig.canvas.draw()  # Ensure the figure is drawn before saving
-        #plt.savefig(f'{output_folder}/Numerical_Features_{start_idx + 1}_to_{end_idx}.png')
         st.pyplot(fig)
         plt.close(fig)
-
 
 # Assuming mean_numerical and grouped_stds are DataFrames with the mean and std values of numerical features respectively
 if 'Display Numerical Means by Category' in graph_options:
@@ -140,7 +138,7 @@ if 'Display Numerical Means by Category' in graph_options:
 
 ## Plotting the distributions
 # Define the function to plot distributions
-def plot_distributions(columns, df, title, file_name_prefix, cols=2):
+def plot_distributions(columns, df, title, cols=2):
     num_plots = len(columns)
     rows = (num_plots // cols) + (num_plots % cols > 0)  # Calculate number of rows needed
 
@@ -161,7 +159,6 @@ def plot_distributions(columns, df, title, file_name_prefix, cols=2):
     plt.tight_layout(pad=3.1)  # Adjust the padding between subplots
     fig.subplots_adjust(top=0.9)  # Adjust the top spacing to make room for the main title
     fig.suptitle(title, fontsize=16)  # Main title
-    #plt.savefig(os.path.join(output_folder, f'{file_name_prefix}_{title}.png'))  # Save the figure
     st.pyplot(fig)
     plt.close(fig)
 
@@ -173,16 +170,15 @@ if 'Display Numerical Distributions' in graph_options:
     for start_index in range(0, len(numerical_cols), group_size):
         end_index = min(start_index + group_size, len(numerical_cols))
         group = numerical_cols[start_index:end_index]
-        plot_distributions(group, filtered_df, f'Distributions_of_Numerical_Features_{start_index + 1}_to_{end_index}', file_name_prefix=f'Features_{start_index + 1}_to_{end_index}')
+        plot_distributions(group, filtered_df, f'Distributions_of_Numerical_Features_{start_index + 1}_to_{end_index}')
 
-    #
     # Handle the remaining columns if the division is not perfect
     if end_index < len(numerical_cols):
         remaining_cols = numerical_cols[end_index:]
-        plot_distributions(remaining_cols, filtered_df, 'Distributions_of_Remaining_Numerical_Features', file_name_prefix='Remaining_Features')
+        plot_distributions(remaining_cols, filtered_df, 'Distributions_of_Remaining_Numerical_Features')
 
 # Define the function to plot non-numerical distributions
-def plot_non_numerical_distributions(columns, df, title, file_name_prefix, cols=2):
+def plot_non_numerical_distributions(columns, df, title, cols=2):
     num_plots = len(columns)
     rows = (num_plots // cols) + (num_plots % cols > 0)  # Calculate number of rows needed
 
@@ -203,12 +199,11 @@ def plot_non_numerical_distributions(columns, df, title, file_name_prefix, cols=
     plt.tight_layout(pad=3.1)  # Adjust the padding between subplots
     fig.subplots_adjust(top=0.9)  # Adjust the top spacing to make room for the main title
     fig.suptitle(title, fontsize=16)  # Main title
-    #plt.savefig(os.path.join(output_folder, f'{file_name_prefix}_{title}.png'))  # Save the figure
     st.pyplot(fig)
     plt.close(fig)
 
 if 'Display Non-Numerical Distributions' in graph_options:
-    plot_non_numerical_distributions(non_numerical_cols, filtered_df, 'Non-Numerical Feature Distributions', 'Non_Numerical_Distributions')
+    plot_non_numerical_distributions(non_numerical_cols, filtered_df, 'Non-Numerical Feature Distributions')
 
 # Visualization function for numerical data
 def plot_numerical_summary(summary, title):
@@ -225,37 +220,11 @@ def plot_numerical_summary(summary, title):
     plt.suptitle(title, fontsize=16)
     plt.tight_layout()
     plt.subplots_adjust(top=0.88)
-    plt.savefig(os.path.join(output_folder, 'Numerical_Summary.png'))  # Save the figure
     st.pyplot(fig)
     plt.close(fig)
 
 if 'Display Numerical Summary' in graph_options:
     plot_numerical_summary(summary_numerical, 'Mean Urban/Regional/Suburban Train Track Sections')
-
-# Visualization function for non-numerical data
-def plot_non_numerical_summary_heatmap(summary, title):
-    # Convert the summary to a dataframe suitable for heatmap
-    summary_df = summary.T
-
-    # Apply label encoding to convert categorical values to numerical values
-    label_encoders = {}
-    for column in summary_df.columns:
-        le = LabelEncoder()
-        summary_df[column] = le.fit_transform(summary_df[column])
-        label_encoders[column] = le
-
-    plt.figure(figsize=(12, 6))
-    sns.heatmap(summary_df, annot=True, cmap='coolwarm', cbar=False, fmt="d", linewidths=.5)
-    plt.title(title, fontsize=16)
-    plt.xlabel('Categories')
-    plt.ylabel('Features')
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_folder, 'Non_Numerical_Summary_Heatmap.png'))  # Save the figure
-    st.pyplot(plt)
-    plt.close()
-
-#if display_non_numerical_summary_heatmap:
-   # plot_non_numerical_summary_heatmap(summary_non_numerical, 'Most Frequent Urban/Regional/Suburban Train Track Sections')
 
 # Define the function to plot non-numerical summary heatmap with percentages
 def plot_non_numerical_summary_heatmap_with_percentages(df, title):
@@ -297,27 +266,26 @@ def plot_non_numerical_summary_heatmap_with_percentages(df, title):
     ax.set_xlabel('Categories')
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
-    plt.savefig(os.path.join(output_folder, 'Non_Numerical_Summary_Heatmap_Percentages.png'))  # Save the figure
     st.pyplot(fig)
-    plt.close()
+    plt.close(fig)
 
-if 'Display Display Non-Numerical Summary Heatmap with Percentages' in graph_options:
+if 'Display Non-Numerical Summary Heatmap with Percentages' in graph_options:
     plot_non_numerical_summary_heatmap_with_percentages(filtered_df, 'Most Frequent Urban/Regional/Suburban Train Track Sections with Percentages')
 
-# Save the summary table to an Excel file
-output_file = os.path.join(output_folder, 'Categories_Summary.xlsx')
-with pd.ExcelWriter(output_file) as writer:
+# Save the summary table to an in-memory Excel file
+output = BytesIO()
+with pd.ExcelWriter(output, engine='openpyxl') as writer:
     summary_numerical.to_excel(writer, sheet_name='Numerical Features')
     summary_std.to_excel(writer, sheet_name='Standard Deviation')
     summary_non_numerical.to_excel(writer, sheet_name='Non-Numerical Features')
+output.seek(0)
 
-st.write("Summarized data saved to Excel file")
+st.write("Summarized data is ready for download")
 
 # Provide download link for the Excel file
-with open(output_file, "rb") as file:
-    btn = st.download_button(
-        label="Download Summary Excel",
-        data=file,
-        file_name="Categories_Summary.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+st.download_button(
+    label="Download Summary Excel",
+    data=output,
+    file_name="Categories_Summary.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
