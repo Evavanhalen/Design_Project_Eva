@@ -23,14 +23,6 @@ logo = Image.open(logo_path)
 # Display the logo in the sidebar
 st.sidebar.image(logo, use_column_width=True)
 
-# Create the output folder if it doesn't exist
-if not os.path.exists(output_folder):
-    os.makedirs(output_folder)
-
-# Load the data from the template
-file_path = r"C:\Users\eefie\PycharmProjects\DesignProject\Data\Template_V03 (1).xlsx"
-df = pd.read_excel(file_path, sheet_name='Template')
-
 # Add a title and description
 st.title('Urban/Suburban/Regional Train Track Types Analysis')
 st.markdown("""
