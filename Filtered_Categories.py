@@ -129,14 +129,14 @@ def plot_all_numerical_features(mean_values, std_values, categories, output_fold
         fig.subplots_adjust(top=0.9)
         fig.suptitle(f'Means of Numerical Features from {start_idx + 1} to {end_idx} by Urban/Regional/Suburban Category', fontsize=16)
         fig.canvas.draw()  # Ensure the figure is drawn before saving
-        plt.savefig(f'{output_folder}/Numerical_Features_{start_idx + 1}_to_{end_idx}.png')
+        #plt.savefig(f'{output_folder}/Numerical_Features_{start_idx + 1}_to_{end_idx}.png')
         st.pyplot(fig)
         plt.close(fig)
 
 
 # Assuming mean_numerical and grouped_stds are DataFrames with the mean and std values of numerical features respectively
 if 'Display Numerical Means by Category' in graph_options:
-    plot_all_numerical_features(mean_numerical, grouped_stds, mean_numerical.index, output_folder)
+    plot_all_numerical_features(mean_numerical, grouped_stds, mean_numerical.index)
 
 ## Plotting the distributions
 # Define the function to plot distributions
@@ -161,7 +161,7 @@ def plot_distributions(columns, df, title, file_name_prefix, cols=2):
     plt.tight_layout(pad=3.1)  # Adjust the padding between subplots
     fig.subplots_adjust(top=0.9)  # Adjust the top spacing to make room for the main title
     fig.suptitle(title, fontsize=16)  # Main title
-    plt.savefig(os.path.join(output_folder, f'{file_name_prefix}_{title}.png'))  # Save the figure
+    #plt.savefig(os.path.join(output_folder, f'{file_name_prefix}_{title}.png'))  # Save the figure
     st.pyplot(fig)
     plt.close(fig)
 
@@ -203,7 +203,7 @@ def plot_non_numerical_distributions(columns, df, title, file_name_prefix, cols=
     plt.tight_layout(pad=3.1)  # Adjust the padding between subplots
     fig.subplots_adjust(top=0.9)  # Adjust the top spacing to make room for the main title
     fig.suptitle(title, fontsize=16)  # Main title
-    plt.savefig(os.path.join(output_folder, f'{file_name_prefix}_{title}.png'))  # Save the figure
+    #plt.savefig(os.path.join(output_folder, f'{file_name_prefix}_{title}.png'))  # Save the figure
     st.pyplot(fig)
     plt.close(fig)
 
