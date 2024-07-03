@@ -9,16 +9,15 @@ import seaborn as sns
 # Suppress specific warnings
 warnings.filterwarnings("ignore", category=FutureWarning, module='seaborn._oldcore')
 
+# Define file paths using relative paths
+file_path = 'Template_V03 (1).xlsx'
+logo_path = 'ProRail logo.png'
+
 # Load the data from the template
-file_path = r"C:\Users\eefie\PycharmProjects\DesignProject\Data\Template_V03 (1).xlsx"
 df = pd.read_excel(file_path, sheet_name='Template')
-output_folder = r"C:\Users\eefie\PycharmProjects\DesignProject\Plots_Mean_Tracks"
 
-# Save the ProRail logo
-png_file_path = r"C:\Users\eefie\PycharmProjects\DesignProject\Data\ProRail logo.png"
-logo = Image.open(png_file_path)
-
-# Display the logo in the sidebar
+# Load and display the ProRail logo
+logo = Image.open(logo_path)
 st.sidebar.image(logo, use_column_width=True)
 
 # Sidebar filters
