@@ -35,18 +35,15 @@ number_of_tracks_filter = st.sidebar.multiselect('Number of tracks', df['Number 
 geocode_exact = st.sidebar.text_input('Geocode', '')
 
  # Helper function to create filters
+ # Helper function to create filters
 def create_numeric_filter(column_name, multiplier=1):
-    min_val = df[column_name].min()
-    max_val = df[column_name].max()
+    min_val = (df[column_name].min() * multiplier)
+    max_val = (df[column_name].max() * multiplier)
     if min_val == max_val:
-        return st.sidebar.text_input(f'Exact {column_name}', value=str(min_val)), None
+        return st.sidebar.text_input(f'Exact {column_name}', value=str(min_val / multiplier)), None
     else:
-        return st.sidebar.text_input(f'Exact {column_name}', ''), st.sidebar.slider(
-            f'{column_name}', 
-            min_value=min_val, 
-            max_value=max_val, 
-            value=(min_val, max_val)
-        )
+        return st.sidebar.text_input(f'Exact {column_name}', ''), st.sidebar.slider(f'{column_name}', min_val, max_val, (min_val, max_val))
+
 
 # Specific columns for sliders
 slider_columns = [ 'Track length (km)', 'Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay',
