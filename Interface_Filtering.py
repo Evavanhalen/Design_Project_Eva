@@ -34,9 +34,14 @@ emplacement_filter = st.sidebar.multiselect('Emplacement', df['Emplacement'].uni
 number_of_tracks_filter = st.sidebar.multiselect('Number of tracks', df['Number of tracks'].unique(), default=df['Number of tracks'].unique())
 geocode_exact = st.sidebar.text_input('Geocode', '')
 
-st.write(df[df['Track Section'] == 11])  # Adjust 'Track ID' to the relevant column if necessary
-# Check the data types of your DataFrame columns
-st.write(df.dtypes)
+
+# Check the range of values in 'Track length (km)'
+min_length = df['Track length (km)'].min()
+max_length = df['Track length (km)'].max()
+
+st.write(f"Min Track Length: {min_length}")
+st.write(f"Max Track Length: {max_length}")
+
 
  # Helper function to create filters
 def create_numeric_filter(column_name, multiplier=1):
