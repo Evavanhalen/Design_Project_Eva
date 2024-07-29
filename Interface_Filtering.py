@@ -24,7 +24,7 @@ st.sidebar.image(logo, use_column_width=True)
 # Sidebar filters
 st.sidebar.title('Filter Options')
 ertms_filter = st.sidebar.multiselect('ERTMS in 2031', df['ERTMS in 2031'].unique(), default=df['ERTMS in 2031'].unique())
-ertms_tranche1 = st.sidebar.multiselect('Tranche 1 ERTMS', df['Tranche 1 ERTMS'].unique(), default=df['Tranche 1 ERTMS'].unique())
+ertms_tranche1_filter = st.sidebar.multiselect('Tranche 1 ERTMS', df['Tranche 1 ERTMS'].unique(), default=df['Tranche 1 ERTMS'].unique())
 track_type_filter = st.sidebar.multiselect('Type of track', df['Type of track'].unique(), default=df['Type of track'].unique())
 travelers_filter = st.sidebar.multiselect('Travelers per day', df['Travelers per day'].unique(), default=df['Travelers per day'].unique())
 urban_filter = st.sidebar.multiselect('Urban/Regional/Suburban', df['Urban/Regional/Suburban'].unique(), default=df['Urban/Regional/Suburban'].unique())
@@ -61,8 +61,8 @@ for column in slider_columns:
     filters[column] = (exact, slider)
 
 # Apply filters
-filtered_df = df[(df['ERTMS in 2031'].isin(ertms_tranche1)) &
-                 (df['Tranche 1 ERTMS'].isin(ertms_tranche1))
+filtered_df = df[(df['ERTMS in 2031'].isin(ertms_filter)) &
+                 (df['Tranche 1 ERTMS'].isin(ertms_tranche1_filter))
                  (df['Type of track'].isin(track_type_filter)) &
                  (df['Travelers per day'].isin(travelers_filter)) &
                  (df['Urban/Regional/Suburban'].isin(urban_filter)) &
