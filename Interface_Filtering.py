@@ -34,28 +34,22 @@ emplacement_filter = st.sidebar.multiselect('Emplacement', df['Emplacement'].uni
 number_of_tracks_filter = st.sidebar.multiselect('Number of tracks', df['Number of tracks'].unique(), default=df['Number of tracks'].unique())
 geocode_exact = st.sidebar.text_input('Geocode', '')
 
+ # Helper function to create filters
 def create_numeric_filter(column_name, multiplier=1):
-    # Ensure the column data is numeric
-    try:
-        df[column_name] = pd.to_numeric(df[column_name], errors='coerce')
-        min_val = df[column_name].min() * multiplier
-        max_val = df[column_name].max() * multiplier
-        if pd.isna(min_val) or pd.isna(max_val):
-            return None, None
-        if min_val == max_val:
-            return st.sidebar.text_input(f'Exact {column_name}', value=str(min_val / multiplier)), None
-        else:
-            return st.sidebar.text_input(f'Exact {column_name}', ''), st.sidebar.slider(f'{column_name}', int(min_val), int(max_val), (int(min_val), int(max_val)))
-    except Exception as e:
-        st.sidebar.error(f"Error processing column {column_name}: {e}")
-        return None, None
+    min_val = int(df[column_name].min() * multiplier)
+    max_val = int(df[column_name].max() * multiplier)
+    if min_val == max_val:
+        return st.sidebar.text_input(f'Exact {column_name}', value=str(min_val / multiplier)), None
+    else:
+        return st.sidebar.text_input(f'Exact {column_name}', ''), st.sidebar.slider(f'{column_name}', min_val, max_val, (min_val, max_val))
+
 # Specific columns for sliders
-slider_columns = [
-    'Track length (km)', 'km track', 'ATB beacon', 'Axle counters', 'Balise', 'Board signal', 'Crossing', 'Level Crossing',
+slider_columns = [ 'Track length (km)', 'Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay',
+    'Loam', 'Sand combination', 'Clay combination', 'Urban area'
+    'km track', 'ATB beacon', 'Axle counters', 'Balise', 'Board signal', 'Crossing', 'Level Crossing',
     'Light signal', 'Matrix signal', 'Stations', 'Switches', 'Track current sections', 'Railway Viaduct',
     'Viaduct', 'Railway Bridge', 'Traffic Bridge', 'Railway Tunnel', 'Ecoduct',
-    'Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay',
-    'Loam', 'Sand combination', 'Clay combination', 'Urban area'
+    
 ]
 
 # Numeric filters with ranges and exact values
