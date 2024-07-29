@@ -59,7 +59,8 @@ for column in slider_columns:
     filters[column] = (exact, slider)
 
 # Apply filters
-filtered_df = df[(df['ERTMS in 2031'].isin(ertms_filter)) &
+filtered_df = df[(df['ERTMS in 2031'].isin(ertms_tranche1)) &
+                 (df['ERTMS Tranche 1'].isin(track_type_filter))
                  (df['Type of track'].isin(track_type_filter)) &
                  (df['Travelers per day'].isin(travelers_filter)) &
                  (df['Urban/Regional/Suburban'].isin(urban_filter)) &
@@ -90,10 +91,7 @@ def apply_numeric_filter(df, column_name, exact_value, range_value, multiplier=1
     elif range_value:
         df = df[df[column_name].between(range_value[0] / multiplier, range_value[1] / multiplier)]
     return df
-
-for column, (exact_value, range_value) in filters.items():
-    filtered_df = apply_numeric_filter(filtered_df, column, exact_value, range_value, 1 if column != 'Peat' else 100)
-
+ 
 # Display the results
 st.title('Filtered Train Track Sections')
 st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard."
