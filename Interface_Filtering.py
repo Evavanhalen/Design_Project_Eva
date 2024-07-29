@@ -62,7 +62,7 @@ for column in slider_columns:
 
 # Apply filters
 filtered_df = df[(df['ERTMS in 2031'].isin(ertms_filter)) &
-                 (df['Tranche 1 ERTMS'].isin(ertms_tranche1_filter))
+                 (df['Tranche 1 ERTMS'].isin(ertms_tranche1_filter)) &
                  (df['Type of track'].isin(track_type_filter)) &
                  (df['Travelers per day'].isin(travelers_filter)) &
                  (df['Urban/Regional/Suburban'].isin(urban_filter)) &
