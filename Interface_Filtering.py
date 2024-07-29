@@ -35,6 +35,8 @@ number_of_tracks_filter = st.sidebar.multiselect('Number of tracks', df['Number 
 geocode_exact = st.sidebar.text_input('Geocode', '')
 
 st.write(df[df['Track Section'] == 11])  # Adjust 'Track ID' to the relevant column if necessary
+# Check the data types of your DataFrame columns
+st.write(df.dtypes)
 
  # Helper function to create filters
 def create_numeric_filter(column_name, multiplier=1):
