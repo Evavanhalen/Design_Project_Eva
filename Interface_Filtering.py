@@ -47,7 +47,7 @@ def create_numeric_filter(column_name, multiplier=1):
 
 # Specific columns for sliders
 slider_columns = [ 'Track length (km)', 'Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay',
-    'Loam', 'Sand combination', 'Clay combination', 'Urban area'
+    'Loam', 'Sand combination', 'Clay combination', 'Urban area',
     'km track', 'ATB beacon', 'Axle counters', 'Balise', 'Board signal', 'Crossing', 'Level Crossing',
     'Light signal', 'Matrix signal', 'Stations', 'Switches', 'Track current sections', 'Railway Viaduct',
     'Viaduct', 'Railway Bridge', 'Traffic Bridge', 'Railway Tunnel', 'Ecoduct',
