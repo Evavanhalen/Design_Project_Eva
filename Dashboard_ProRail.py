@@ -309,7 +309,6 @@ Histograms provide a visual representation of the distribution of numerical feat
 if 'Histograms for Distribution' in graph_options:
     plot_histograms(filtered_df)
 
-# Excel export function
 # Function to export DataFrame to Excel
 def export_to_excel(df, filtered=True):
     with BytesIO() as buffer:
@@ -318,36 +317,41 @@ def export_to_excel(df, filtered=True):
         writer.close()
         return buffer.getvalue()
 
-# Button to download filtered data
-if st.button('Download Filtered Summary as Excel'):
+# Function to handle file download
+def download_file(file_data, file_name):
+    st.download_button(
+        label=f'Download {file_name}',
+        data=file_data,
+        file_name=file_name,
+        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+# Track download request state
+if 'filtered_download_requested' not in st.session_state:
+    st.session_state.filtered_download_requested = False
+if 'full_download_requested' not in st.session_state:
+    st.session_state.full_download_requested = False
+
+# Button to request filtered data download
+if st.button('Request Filtered Summary Download'):
+    st.session_state.filtered_download_requested = True
+    st.session_state.full_download_requested = False
+
+# Button to request full data download
+if st.button('Request Full Summary Download'):
+    st.session_state.full_download_requested = True
+    st.session_state.filtered_download_requested = False
+
+# Handle file download based on user request
+if st.session_state.filtered_download_requested:
     filtered_file = export_to_excel(df, filtered=True)
-    st.session_state['filtered_file'] = filtered_file
-    st.session_state['filtered_downloaded'] = True
+    download_file(filtered_file, 'Filtered_Summary.xlsx')
+    st.session_state.filtered_download_requested = False  # Reset state after download
 
-# Button to download full data
-if st.button('Download Full Summary as Excel'):
+if st.session_state.full_download_requested:
     full_file = export_to_excel(df, filtered=False)
-    st.session_state['full_file'] = full_file
-    st.session_state['full_downloaded'] = True
-
-# Handle file downloads based on state
-if st.session_state.get('filtered_downloaded'):
-    st.download_button(
-        label='Download Filtered Summary',
-        data=st.session_state['filtered_file'],
-        file_name='Filtered_Summary.xlsx',
-        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    st.session_state['filtered_downloaded'] = False  # Reset state after download
-
-if st.session_state.get('full_downloaded'):
-    st.download_button(
-        label='Download Full Summary',
-        data=st.session_state['full_file'],
-        file_name='Full_Summary.xlsx',
-        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    st.session_state['full_downloaded'] = False  # Reset state after download
+    download_file(full_file, 'Full_Summary.xlsx')
+    st.session_state.full_download_requested = False  # Reset state after download
 
 st.title('Map of Train Track Sections')
 # Load and display the ProRail logo
