@@ -495,6 +495,23 @@ st.download_button(
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
 
+# Save the summary table to an in-memory Excel file
+output = BytesIO()
+with pd.ExcelWriter(output, engine='openpyxl') as writer:
+    summary_numerical.to_excel(writer, sheet_name='Numerical Features')
+    summary_std.to_excel(writer, sheet_name='Standard Deviation')
+    summary_non_numerical.to_excel(writer, sheet_name='Non-Numerical Features')
+output.seek(0)
+
+st.write("Summarized data is ready for download")
+
+# Provide download link for the Excel file
+st.download_button(
+    label="Download Summary Excel",
+    data=output,
+    file_name="Categories_Summary.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
 
 # Main content
 st.write("Summarized data is ready for download")
