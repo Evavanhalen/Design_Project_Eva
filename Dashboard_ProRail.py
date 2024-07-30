@@ -293,11 +293,6 @@ if 'Display Numerical Means by Category' in graph_options:
     mode_non_numerical_categories = filtered_df.groupby('Urban/Regional/Suburban')[non_numerical_cols].agg(lambda x: x.mode()[0])
     grouped_stds = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].std()
 
-# Combine numerical and non-numerical summaries
-summary_numerical_categories = mean_numerical_categories
-summary_non_numerical = mode_non_numerical_categories
-summary_std = grouped_stds
-    plot_all_numerical_features(mean_values, std_values, categories, group_size=6)
 
 # Function to display numerical summaries
 def plot_numerical_summary(df):
