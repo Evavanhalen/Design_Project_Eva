@@ -32,7 +32,7 @@ all_columns = df.columns.tolist()
 selected_columns = st.sidebar.multiselect('Select Columns to Include', all_columns, default=all_columns)
 
 # Filter the dataframe to include only the selected columns
-df_selected_columns = df[selected_columns]
+checked_df = df[selected_columns]
 
 # Sidebar filters
 st.sidebar.title('Filter Options')
