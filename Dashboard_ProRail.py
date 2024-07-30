@@ -41,19 +41,20 @@ for column in df.columns:
         # Skip descriptive columns from having checkboxes
         continue
     
-    if df[column].dtype in ['object', 'category']:  # Categorical columns
-        include_column = st.sidebar.checkbox(f"Include {column}", value=True, key=f"{column}_include")
-        filter_values = []
-        if include_column:
-            filter_values = st.sidebar.multiselect(f'{column}', df[column].unique(), default=df[column].unique(), key=f"{column}_filter")
-        column_inclusion[column] = (include_column, filter_values)
-    else:  # Numeric columns
+    # Check the data type to decide on multiselect or slider
+    if pd.api.types.is_numeric_dtype(df[column]):
         include_column = st.sidebar.checkbox(f"Include {column}", value=True, key=f"{column}_include")
         filter_values = None
         if include_column:
             min_val = df[column].min()
             max_val = df[column].max()
             filter_values = st.sidebar.slider(f'{column}', min_val, max_val, (min_val, max_val), key=f"{column}_filter")
+        column_inclusion[column] = (include_column, filter_values)
+    else:
+        include_column = st.sidebar.checkbox(f"Include {column}", value=True, key=f"{column}_include")
+        filter_values = []
+        if include_column:
+            filter_values = st.sidebar.multiselect(f'{column}', df[column].unique(), default=df[column].unique(), key=f"{column}_filter")
         column_inclusion[column] = (include_column, filter_values)
 
 # Start with descriptive columns always included
@@ -62,17 +63,15 @@ filtered_df = df[descriptive_columns].copy()
 # Apply the filtering and column inclusion logic
 for column, (include, filter_values) in column_inclusion.items():
     if include:
-        if column in df.select_dtypes(include=['object', 'category']).columns:
+        if pd.api.types.is_numeric_dtype(df[column]):
             if filter_values:
-                # Apply filters for categorical data
-                filtered_df = filtered_df.join(df[df[column].isin(filter_values)][[column]], how='inner')
+                min_val, max_val = filter_values
+                filtered_df = filtered_df.join(df[df[column].between(min_val, max_val)][[column]], how='inner')
             else:
                 filtered_df = filtered_df.join(df[[column]], how='inner')
         else:
             if filter_values:
-                # Apply filters for numerical data
-                min_val, max_val = filter_values
-                filtered_df = filtered_df.join(df[df[column].between(min_val, max_val)][[column]], how='inner')
+                filtered_df = filtered_df.join(df[df[column].isin(filter_values)][[column]], how='inner')
             else:
                 filtered_df = filtered_df.join(df[[column]], how='inner')
 
