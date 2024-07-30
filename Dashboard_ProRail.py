@@ -109,7 +109,7 @@ st.write(f"Percentage of km tracks matching criteria: {percentage_matching_km_tr
 st.title('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Display Numerical Means by Category', 'Display Numerical Distributions', 'Display Non-Numerical Distributions', 'Display Numerical Summary', 'Display Non-Numerical Summary Heatmap with Percentages', 'Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section', 'Correlation Matrix', 'Histograms for Distribution']
+    ['Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section', 'Correlation Matrix', 'Histograms for Distribution', 'Display Numerical Means by Category', 'Display Numerical Distributions', 'Display Non-Numerical Distributions', 'Display Numerical Summary', 'Display Non-Numerical Summary Heatmap with Percentages' ]
 )
 
 # Pie chart for track count
@@ -213,6 +213,94 @@ A correlation matrix is a table showing correlation coefficients between sets of
     ax4.set_title('Correlation Matrix')
     st.pyplot(fig4)
 
+# Histograms for Distribution of Numerical Features
+if 'Histograms for Distribution' in graph_options:
+    st.title('Histograms for Distribution of Numerical Features')
+    st.markdown("""
+## Histograms for Distribution of Numerical Features
+
+Histograms provide a visual representation of the distribution of numerical features in the dataset. They show how the data points are spread across different values, which helps in understanding the underlying patterns and distributions of the data.
+
+### Key Points to Consider:
+
+**Histogram Interpretation:**
+- **Bars**: Each bar in a histogram represents the frequency of data points that fall within a specific range.
+  - The height of the bar indicates how many data points are in that range.
+- **Bins**: The range of values is divided into bins or intervals. The width of each bin affects the granularity of the histogram.
+  - More bins provide a more detailed view, while fewer bins provide a more summarized view.
+
+**Understanding Distribution Shapes:**
+- **Normal Distribution**: A symmetric, bell-shaped curve where most data points cluster around the mean.
+- **Skewed Distribution**: 
+  - **Right-Skewed (Positive Skew)**: Most data points are concentrated on the left, with a long tail on the right.
+  - **Left-Skewed (Negative Skew)**: Most data points are concentrated on the right, with a long tail on the left.
+- **Uniform Distribution**: Data points are evenly distributed across the range.
+- **Bimodal/Multimodal Distribution**: There are two or more peaks (modes) in the distribution.
+
+### Analyzing Histograms:
+- **Central Tendency**: Identifies the central value where data points tend to cluster.
+- **Spread**: Measures how spread out the data points are (variance, standard deviation).
+- **Outliers**: Identifies data points that fall far from the main distribution.
+- **Skewness and Kurtosis**: 
+  - **Skewness** indicates the asymmetry of the distribution.
+  - **Kurtosis** indicates the "tailedness" of the distribution, or how heavy/light the tails are.
+""")
+    fig5, axes = plt.subplots(nrows=len(numerical_cols), ncols=1, figsize=(10, len(numerical_cols) * 4))
+    plt.subplots_adjust(hspace=0.5)
+    for col, ax in zip(numerical_cols, axes):
+        sns.histplot(df[col], kde=True, ax=ax)
+        ax.set_title(f'Distribution of {col}')
+    st.pyplot(fig5)
+
+# Add a title and description
+st.title('Urban/Suburban/Regional Train Track Types Analysis')
+st.markdown("""
+    This dashboard allows you to analyze and visualize various features of train tracks categorized into urban, suburban, and regional types.
+
+    **Instructions:**
+    1. Use the sidebar to include or exclude specific features in the analysis.
+    2. Choose whether to exclude emplacement data.
+    3. Select the types of plots you want to display.
+    4. The dashboard provides options to display means, distributions, and summaries of numerical and non-numerical features.
+
+    **Note:** The data is filtered based on the selections you make in the sidebar.
+""")
+
+# Filter columns to relevant features, leave out track section numbers, geocodes, names
+relevant_columns = df.loc[:, 'Emplacement':]
+
+# Define specific columns to include/exclude
+specific_columns = numerical_cols.tolist() + non_numerical_cols.tolist()
+
+# Function to create include/exclude checkboxes
+def create_include_checkbox(column_name):
+    include_key = f"{column_name}_include"
+    include = st.sidebar.checkbox(f"Include {column_name}", value=True, key=include_key)
+    return include, column_name
+
+# Apply include checkboxes to all relevant columns
+include_filters = []
+included_columns = []
+for col in specific_columns:
+    include, col_name = create_include_checkbox(col)
+    if include:
+        included_columns.append(col_name)
+
+# Filter the dataframe based on selected columns
+checked_df = df[included_columns]
+
+# Group by 'Urban/Regional/Suburban' and calculate mean and standard deviation for numerical features and most frequent value for non-numerical features
+numerical_cols = checked_df.select_dtypes(include=[float, int]).columns
+non_numerical_cols = checked_df.select_dtypes(exclude=[float, int]).columns
+
+mean_numerical = checked_df.groupby('Urban/Regional/Suburban')[numerical_cols].mean()
+mode_non_numerical = checked_df.groupby('Urban/Regional/Suburban')[non_numerical_cols].agg(lambda x: x.mode()[0])
+grouped_stds = checked_df.groupby('Urban/Regional/Suburban')[numerical_cols].std()
+
+# Combine numerical and non-numerical summaries
+summary_numerical = mean_numerical
+summary_non_numerical = mode_non_numerical
+summary_std = grouped_stds
 
 # Define the function to plot all numerical features
 def plot_all_numerical_features(mean_values, std_values, categories, group_size=6):
@@ -247,67 +335,149 @@ def plot_all_numerical_features(mean_values, std_values, categories, group_size=
         fig.suptitle(f'Means of Numerical Features from {start_idx + 1} to {end_idx} by Urban/Regional/Suburban Category', fontsize=16)
         st.pyplot(fig)
         plt.close(fig)
+        
 
-# Display Visualization Options
+# Assuming mean_numerical and grouped_stds are DataFrames with the mean and std values of numerical features respectively
 if 'Display Numerical Means by Category' in graph_options:
-    st.write("**Mean Values by Category**")
-    mean_numerical_categories = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].mean()
-    mode_non_numerical_categories = filtered_df.groupby('Urban/Regional/Suburban')[non_numerical_cols].agg(lambda x: x.mode()[0])
-    grouped_stds = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].std()
+    plot_all_numerical_features(mean_numerical, grouped_stds, mean_numerical.index)
 
+## Plotting the distributions
+# Define the function to plot distributions
+def plot_distributions(columns, df, title, cols=2):
+    num_plots = len(columns)
+    rows = (num_plots // cols) + (num_plots % cols > 0)  # Calculate number of rows needed
 
-# Function to display numerical summaries
-def plot_numerical_summary(df):
-    st.write("**Summary of Numerical Features**")
-    st.write(df.describe())
+    fig, axes = plt.subplots(rows, cols, figsize=(12, 5 * rows))
+    axes = axes.flatten()
+
+    for i, col in enumerate(columns):
+        sns.boxplot(x='Urban/Regional/Suburban', y=col, data=df, ax=axes[i])
+        axes[i].set_title(f'Distribution of {col}', fontsize=10, pad=10)
+        axes[i].set_ylabel(col, fontsize=8)
+        axes[i].set_xlabel('')
+        axes[i].tick_params(axis='x', labelsize=6)
+
+    # Remove any empty subplots
+    for j in range(i + 1, len(axes)):
+        fig.delaxes(axes[j])
+
+    plt.tight_layout(pad=3.1)  # Adjust the padding between subplots
+    fig.subplots_adjust(top=0.9)  # Adjust the top spacing to make room for the main title
+    fig.suptitle(title, fontsize=16)  # Main title
+    st.pyplot(fig)
+    plt.close(fig)
+
+# Split numerical columns into smaller groups for better readability
+group_size = 6  # Number of subplots per figure
+
+# Create subfigures for each group
+if 'Display Numerical Distributions' in graph_options:
+    for start_index in range(0, len(numerical_cols), group_size):
+        end_index = min(start_index + group_size, len(numerical_cols))
+        group = numerical_cols[start_index:end_index]
+        plot_distributions(group, filtered_df, f'Distributions_of_Numerical_Features_{start_index + 1}_to_{end_index}')
+
+    # Handle the remaining columns if the division is not perfect
+    if end_index < len(numerical_cols):
+        remaining_cols = numerical_cols[end_index:]
+        plot_distributions(remaining_cols, filtered_df, 'Distributions_of_Remaining_Numerical_Features')
+
+# Define the function to plot non-numerical distributions
+def plot_non_numerical_distributions(columns, df, title, cols=2):
+    num_plots = len(columns)
+    rows = (num_plots // cols) + (num_plots % cols > 0)  # Calculate number of rows needed
+
+    fig, axes = plt.subplots(rows, cols, figsize=(12, 5 * rows))
+    axes = axes.flatten()
+
+    for i, col in enumerate(columns):
+        sns.countplot(x='Urban/Regional/Suburban', hue=col, data=df, ax=axes[i])
+        axes[i].set_title(f'Distribution of {col}', fontsize=10, pad=10)
+        axes[i].set_xlabel('Urban/Regional/Suburban Category', fontsize=8)
+        axes[i].tick_params(axis='x', labelsize=6, rotation=45)  # Adjust font size and rotation
+        axes[i].legend(title=col, fontsize=6, title_fontsize=8)  # Adjust legend font size
+
+    # Remove any empty subplots
+    for j in range(i + 1, len(axes)):
+        fig.delaxes(axes[j])
+
+    plt.tight_layout(pad=3.1)  # Adjust the padding between subplots
+    fig.subplots_adjust(top=0.9)  # Adjust the top spacing to make room for the main title
+    fig.suptitle(title, fontsize=16)  # Main title
+    st.pyplot(fig)
+    plt.close(fig)
+
+if 'Display Non-Numerical Distributions' in graph_options:
+    plot_non_numerical_distributions(non_numerical_cols, filtered_df, 'Non-Numerical Feature Distributions')
+
+# Visualization function for numerical data
+def plot_numerical_summary(summary, title):
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+    categories = ['Urban', 'Regional', 'Suburban']
+
+    for i, category in enumerate(categories):
+        summary.loc[category].plot(kind='bar', ax=axes[i])
+        axes[i].set_title(f'Mean {category} Train Track Section')
+        axes[i].set_ylabel('Mean Value')
+        axes[i].set_xlabel('Features')
+        axes[i].tick_params(axis='x', labelsize=8, rotation=90)
+
+    plt.suptitle(title, fontsize=16)
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.88)
+    st.pyplot(fig)
+    plt.close(fig)
 
 if 'Display Numerical Summary' in graph_options:
-    plot_numerical_summary(filtered_df)
+    plot_numerical_summary(summary_numerical, 'Mean Urban/Regional/Suburban Train Track Sections')
 
-# Function to display histograms for distributions
-def plot_histograms(df):
-    st.write("**Histograms for Distributions**")
-    st.markdown("""
-## Histograms for Distribution of Numerical Features
+# Define the function to plot non-numerical summary heatmap with percentages
+def plot_non_numerical_summary_heatmap_with_percentages(df, title):
+    summary_percentages = pd.DataFrame()
 
-Histograms provide a visual representation of the distribution of numerical features in the dataset. They show how the data points are spread across different values, which helps in understanding the underlying patterns and distributions of the data.
+    # Create a mapping of feature to category
+    feature_category_mapping = {
+        'Tranche 1 ERTMS': ['Yes', 'No'],
+        'ERTMS in 2031': ['Yes', 'No'],
+        'Number of tracks': ['single', 'double', 'three'],
+        'Type of track': ['primary', 'secondary', 'tertairy'],
+        'Travelers per day': ['0-1000', '1000-25000', '5000-10000'],
+        'Urban/Regional/Suburban': ['Urban', 'Regional', 'Suburban'],
+        'Safety System': ['ATB NG', 'ATB VV'],
+        'Detection system': ['Axle counters', 'Circuit'],
+    }
 
-### Key Points to Consider:
+    for feature in non_numerical_cols:
+        feature_counts = df.groupby(['Urban/Regional/Suburban', feature]).size().unstack(fill_value=0)
+        feature_percentages = feature_counts.div(feature_counts.sum(axis=1), axis=0) * 100
+        summary_percentages = pd.concat([summary_percentages, feature_percentages])
 
-**Histogram Interpretation:**
-- **Bars**: Each bar in a histogram represents the frequency of data points that fall within a specific range.
-  - The height of the bar indicates how many data points are in that range.
-- **Bins**: The range of values is divided into bins or intervals. The width of each bin affects the granularity of the histogram.
-  - More bins provide a more detailed view, while fewer bins provide a more summarized view.
+    # Create new column names with category
+    new_column_names = []
+    for col in summary_percentages.columns:
+        for feature, categories in feature_category_mapping.items():
+            if col in categories:
+                new_column_names.append(f'{feature}-{col}')
+                break
+        else:
+            new_column_names.append(col)
 
-**Understanding Distribution Shapes:**
-- **Normal Distribution**: A symmetric, bell-shaped curve where most data points cluster around the mean.
-- **Skewed Distribution**: 
-  - **Right-Skewed (Positive Skew)**: Most data points are concentrated on the left, with a long tail on the right.
-  - **Left-Skewed (Negative Skew)**: Most data points are concentrated on the right, with a long tail on the left.
-- **Uniform Distribution**: Data points are evenly distributed across the range.
-- **Bimodal/Multimodal Distribution**: There are two or more peaks (modes) in the distribution.
+    summary_percentages.columns = new_column_names
 
-### Analyzing Histograms:
-- **Central Tendency**: Identifies the central value where data points tend to cluster.
-- **Spread**: Measures how spread out the data points are (variance, standard deviation).
-- **Outliers**: Identifies data points that fall far from the main distribution.
-- **Skewness and Kurtosis**: 
-  - **Skewness** indicates the asymmetry of the distribution.
-  - **Kurtosis** indicates the "tailedness" of the distribution, or how heavy/light the tails are.
-""")
-    numerical_columns = df.select_dtypes(include=['float64', 'int64']).columns
-    for column in numerical_columns:
-        plt.figure(figsize=(10, 4))
-        sns.histplot(df[column], kde=True, bins=30)
-        plt.title(f'Histogram of {column}')
-        plt.xlabel(column)
-        plt.ylabel('Frequency')
-        st.pyplot()
-        plt.close()
+    # Create a heatmap with percentages
+    fig, ax = plt.subplots(figsize=(15, 10))
+    sns.heatmap(summary_percentages, annot=True, cmap='coolwarm', cbar=False, fmt=".1f", linewidths=.5, ax=ax)
+    ax.set_title(title, fontsize=16)
+    ax.set_ylabel('Features')
+    ax.set_xlabel('Categories')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    st.pyplot(fig)
+    plt.close(fig)
 
-if 'Histograms for Distribution' in graph_options:
-    plot_histograms(filtered_df)
+if 'Display Non-Numerical Summary Heatmap with Percentages' in graph_options:
+    plot_non_numerical_summary_heatmap_with_percentages(filtered_df, 'Most Frequent Urban/Regional/Suburban Train Track Sections with Percentages')
+
 
 # Save the summary table to an in-memory Excel file
 output = BytesIO()
