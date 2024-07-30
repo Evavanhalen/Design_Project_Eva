@@ -213,44 +213,6 @@ A correlation matrix is a table showing correlation coefficients between sets of
     ax4.set_title('Correlation Matrix')
     st.pyplot(fig4)
 
-# Histograms for Distribution of Numerical Features
-if 'Histograms for Distribution' in graph_options:
-    st.title('Histograms for Distribution of Numerical Features')
-    st.markdown("""
-## Histograms for Distribution of Numerical Features
-
-Histograms provide a visual representation of the distribution of numerical features in the dataset. They show how the data points are spread across different values, which helps in understanding the underlying patterns and distributions of the data.
-
-### Key Points to Consider:
-
-**Histogram Interpretation:**
-- **Bars**: Each bar in a histogram represents the frequency of data points that fall within a specific range.
-  - The height of the bar indicates how many data points are in that range.
-- **Bins**: The range of values is divided into bins or intervals. The width of each bin affects the granularity of the histogram.
-  - More bins provide a more detailed view, while fewer bins provide a more summarized view.
-
-**Understanding Distribution Shapes:**
-- **Normal Distribution**: A symmetric, bell-shaped curve where most data points cluster around the mean.
-- **Skewed Distribution**: 
-  - **Right-Skewed (Positive Skew)**: Most data points are concentrated on the left, with a long tail on the right.
-  - **Left-Skewed (Negative Skew)**: Most data points are concentrated on the right, with a long tail on the left.
-- **Uniform Distribution**: Data points are evenly distributed across the range.
-- **Bimodal/Multimodal Distribution**: There are two or more peaks (modes) in the distribution.
-
-### Analyzing Histograms:
-- **Central Tendency**: Identifies the central value where data points tend to cluster.
-- **Spread**: Measures how spread out the data points are (variance, standard deviation).
-- **Outliers**: Identifies data points that fall far from the main distribution.
-- **Skewness and Kurtosis**: 
-  - **Skewness** indicates the asymmetry of the distribution.
-  - **Kurtosis** indicates the "tailedness" of the distribution, or how heavy/light the tails are.
-""")
-    fig5, axes = plt.subplots(nrows=len(numerical_cols), ncols=1, figsize=(10, len(numerical_cols) * 4))
-    plt.subplots_adjust(hspace=0.5)
-    for col, ax in zip(numerical_cols, axes):
-        sns.histplot(df[col], kde=True, ax=ax)
-        ax.set_title(f'Distribution of {col}')
-    st.pyplot(fig5)
 
 # Define the function to plot all numerical features
 def plot_all_numerical_features(mean_values, std_values, categories, group_size=6):
@@ -305,6 +267,35 @@ if 'Display Numerical Summary' in graph_options:
 # Function to display histograms for distributions
 def plot_histograms(df):
     st.write("**Histograms for Distributions**")
+    st.markdown("""
+## Histograms for Distribution of Numerical Features
+
+Histograms provide a visual representation of the distribution of numerical features in the dataset. They show how the data points are spread across different values, which helps in understanding the underlying patterns and distributions of the data.
+
+### Key Points to Consider:
+
+**Histogram Interpretation:**
+- **Bars**: Each bar in a histogram represents the frequency of data points that fall within a specific range.
+  - The height of the bar indicates how many data points are in that range.
+- **Bins**: The range of values is divided into bins or intervals. The width of each bin affects the granularity of the histogram.
+  - More bins provide a more detailed view, while fewer bins provide a more summarized view.
+
+**Understanding Distribution Shapes:**
+- **Normal Distribution**: A symmetric, bell-shaped curve where most data points cluster around the mean.
+- **Skewed Distribution**: 
+  - **Right-Skewed (Positive Skew)**: Most data points are concentrated on the left, with a long tail on the right.
+  - **Left-Skewed (Negative Skew)**: Most data points are concentrated on the right, with a long tail on the left.
+- **Uniform Distribution**: Data points are evenly distributed across the range.
+- **Bimodal/Multimodal Distribution**: There are two or more peaks (modes) in the distribution.
+
+### Analyzing Histograms:
+- **Central Tendency**: Identifies the central value where data points tend to cluster.
+- **Spread**: Measures how spread out the data points are (variance, standard deviation).
+- **Outliers**: Identifies data points that fall far from the main distribution.
+- **Skewness and Kurtosis**: 
+  - **Skewness** indicates the asymmetry of the distribution.
+  - **Kurtosis** indicates the "tailedness" of the distribution, or how heavy/light the tails are.
+""")
     numerical_columns = df.select_dtypes(include=['float64', 'int64']).columns
     for column in numerical_columns:
         plt.figure(figsize=(10, 4))
@@ -345,22 +336,6 @@ if st.button('Download Full Summary as Excel'):
         file_name='Full_Summary.xlsx',
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-
-# Save the summary table to an in-memory Excel file
-output = BytesIO()
-with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    mean_track_section.to_excel(writer, sheet_name='Mean Track Section')
-output.seek(0)
-
-st.write("Summarized data is ready for download")
-
-# Provide download link for the Excel file
-st.download_button(
-    label="Download Summary Excel",
-    data=output,
-    file_name="Mean_Track_Summary.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
 
 st.title('Map of Train Track Sections')
 # Load and display the ProRail logo
