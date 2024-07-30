@@ -310,32 +310,44 @@ if 'Histograms for Distribution' in graph_options:
     plot_histograms(filtered_df)
 
 # Excel export function
+# Function to export DataFrame to Excel
 def export_to_excel(df, filtered=True):
     with BytesIO() as buffer:
         writer = pd.ExcelWriter(buffer, engine='openpyxl')
         df.to_excel(writer, index=False, sheet_name='Filtered Summary' if filtered else 'Full Summary')
-        writer.close()
+        writer.save()
         return buffer.getvalue()
 
-# Handle button for downloading filtered data
+# Button to download filtered data
 if st.button('Download Filtered Summary as Excel'):
-    filtered_file = export_to_excel(filtered_df, filtered=True)
+    filtered_file = export_to_excel(df, filtered=True)
+    st.session_state['filtered_file'] = filtered_file
+    st.session_state['filtered_downloaded'] = True
+
+# Button to download full data
+if st.button('Download Full Summary as Excel'):
+    full_file = export_to_excel(df, filtered=False)
+    st.session_state['full_file'] = full_file
+    st.session_state['full_downloaded'] = True
+
+# Handle file downloads based on state
+if st.session_state.get('filtered_downloaded'):
     st.download_button(
         label='Download Filtered Summary',
-        data=filtered_file,
+        data=st.session_state['filtered_file'],
         file_name='Filtered_Summary.xlsx',
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+    st.session_state['filtered_downloaded'] = False  # Reset state after download
 
-# Handle button for downloading full data
-if st.button('Download Full Summary as Excel'):
-    full_file = export_to_excel(df, filtered=False)
+if st.session_state.get('full_downloaded'):
     st.download_button(
         label='Download Full Summary',
-        data=full_file,
+        data=st.session_state['full_file'],
         file_name='Full_Summary.xlsx',
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+    st.session_state['full_downloaded'] = False  # Reset state after download
 
 st.title('Map of Train Track Sections')
 # Load and display the ProRail logo
