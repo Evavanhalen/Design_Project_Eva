@@ -314,7 +314,7 @@ def export_to_excel(df, filtered=True):
     with BytesIO() as buffer:
         writer = pd.ExcelWriter(buffer, engine='openpyxl')
         df.to_excel(writer, index=False, sheet_name='Filtered Summary' if filtered else 'Full Summary')
-        writer.save()
+        writer.close()
         return buffer.getvalue()
 
 # Button to download filtered data
@@ -336,6 +336,7 @@ if st.button('Download Full Summary as Excel'):
         file_name='Full_Summary.xlsx',
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+
 
 st.title('Map of Train Track Sections')
 # Load and display the ProRail logo
