@@ -47,49 +47,46 @@ emplacement_filter = st.sidebar.multiselect('Emplacement', df['Emplacement'].uni
 number_of_tracks_filter = st.sidebar.multiselect('Number of tracks', df['Number of tracks'].unique(), default=df['Number of tracks'].unique())
 geocode_exact = st.sidebar.text_input('Geocode', '')
 
-# Numeric filters
-def create_numeric_filter(column_name, multiplier=1):
-    min_val = df[column_name].min() * multiplier
-    max_val = df[column_name].max() * multiplier
-    if min_val == max_val:
-        return st.sidebar.text_input(f'Exact {column_name}', value=str(min_val / multiplier)), None
-    else:
-        return st.sidebar.text_input(f'Exact {column_name}', ''), st.sidebar.slider(f'{column_name}', min_val, max_val, (min_val, max_val))
+# Numeric filters with include/exclude checkboxes
+def create_numeric_filter_with_checkbox(column_name, multiplier=1):
+    include_filter = st.sidebar.checkbox(f"Include {column_name}", value=True, key=f"{column_name}_include")
+    filter_values = None
+    if include_filter:
+        min_val = df[column_name].min() * multiplier
+        max_val = df[column_name].max() * multiplier
+        filter_values = st.sidebar.slider(f'{column_name}', min_val, max_val, (min_val, max_val), key=f"{column_name}_filter")
+    return include_filter, filter_values
 
-# Specific columns for sliders
-slider_columns = [ 'Track length (km)', 'Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay',
-    'Loam', 'Sand combination', 'Clay combination', 'Urban area',
-    'km track', 'ATB beacon', 'Axle counters', 'Balise', 'Board signal', 'Crossing', 'Level Crossing',
-    'Light signal', 'Matrix signal', 'Stations', 'Switches', 'Track current sections', 'Railway Viaduct',
-    'Viaduct', 'Railway Bridge', 'Traffic Bridge', 'Railway Tunnel', 'Ecoduct',
-]
+slider_columns = ['Track length (km)', 'Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay',
+                  'Loam', 'Sand combination', 'Clay combination', 'Urban area',
+                  'km track', 'ATB beacon', 'Axle counters', 'Balise', 'Board signal', 'Crossing', 'Level Crossing',
+                  'Light signal', 'Matrix signal', 'Stations', 'Switches', 'Track current sections', 'Railway Viaduct',
+                  'Viaduct', 'Railway Bridge', 'Traffic Bridge', 'Railway Tunnel', 'Ecoduct']
 
 filters = {}
 for column in slider_columns:
-    exact, slider = create_numeric_filter(column, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
-    filters[column] = (exact, slider)
+    include, slider = create_numeric_filter_with_checkbox(column, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
+    filters[column] = (include, slider)
 
 # Apply filters
-filtered_df = df[(df['ERTMS in 2031'].isin(ertms_filter)) &
-                 (df['Tranche 1 ERTMS'].isin(ertms_tranche1_filter)) &
-                 (df['Type of track'].isin(track_type_filter)) &
-                 (df['Travelers per day'].isin(travelers_filter)) &
-                 (df['Urban/Regional/Suburban'].isin(urban_filter)) &
-                 (df['Safety System'].isin(safety_filter)) &
-                 (df['Detection system'].isin(detection_filter)) &
-                 (df['Emplacement'].isin(emplacement_filter)) &
-                 (df['Number of tracks'].isin(number_of_tracks_filter))]
+filtered_df = checked_df[(checked_df['ERTMS in 2031'].isin(ertms_filter)) &
+                         (checked_df['Tranche 1 ERTMS'].isin(ertms_tranche1_filter)) &
+                         (checked_df['Type of track'].isin(track_type_filter)) &
+                         (checked_df['Travelers per day'].isin(travelers_filter)) &
+                         (checked_df['Urban/Regional/Suburban'].isin(urban_filter)) &
+                         (checked_df['Safety System'].isin(safety_filter)) &
+                         (checked_df['Detection system'].isin(detection_filter)) &
+                         (checked_df['Emplacement'].isin(emplacement_filter)) &
+                         (checked_df['Number of tracks'].isin(number_of_tracks_filter))]
 
-def apply_numeric_filter(df, column_name, exact_value, range_value, multiplier=1):
-    if exact_value:
-        df = df[df[column_name] == float(exact_value) / multiplier]
-    elif range_value:
+def apply_numeric_filter(df, column_name, range_value, multiplier=1):
+    if range_value:
         df = df[df[column_name].between(range_value[0] / multiplier, range_value[1] / multiplier)]
     return df
 
-for column, (exact_value, range_value) in filters.items():
-    if column in selected_columns:
-        filtered_df = apply_numeric_filter(filtered_df, column, exact_value, range_value, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
+for column, (include, range_value) in filters.items():
+    if include and column in selected_columns:
+        filtered_df = apply_numeric_filter(filtered_df, column, range_value, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
 
 if geocode_exact:
     filtered_df = filtered_df[filtered_df['Geocode'] == geocode_exact]
