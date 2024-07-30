@@ -26,14 +26,6 @@ logo = Image.open(logo_path)
 # Display the logo in the sidebar
 st.sidebar.image(logo, use_column_width=True)
 
-# Sidebar for column selection
-st.sidebar.title('Include/Exclude Columns')
-all_columns = df.columns.tolist()
-selected_columns = st.sidebar.multiselect('Select Columns to Include', all_columns, default=all_columns)
-
-# Filter the dataframe to include only the selected columns
-checked_df = df[selected_columns]
-
 # Function to create filters with include/exclude checkboxes
 def create_filter_with_checkbox(column_name, options):
     include_filter = st.sidebar.checkbox(f"Include {column_name}", value=True, key=f"{column_name}_include")
@@ -86,11 +78,11 @@ for column in slider_columns:
 geocode_exact = st.sidebar.text_input('Geocode', '')
 
 # Apply filters
-filtered_df = checked_df.copy()  # Start with the full dataset based on selected columns
+filtered_df = df.copy()  # Start with the full dataset
 
 # Apply categorical filters
 for column, (include, values) in categorical_filters.items():
-    if include and column in selected_columns:
+    if include:
         filtered_df = filtered_df[filtered_df[column].isin(values)]
 
 # Apply numeric filters
@@ -100,7 +92,7 @@ def apply_numeric_filter(df, column_name, range_value, multiplier=1):
     return df
 
 for column, (include, range_value) in numeric_filters.items():
-    if include and column in selected_columns:
+    if include:
         filtered_df = apply_numeric_filter(filtered_df, column, range_value, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
 
 if geocode_exact:
