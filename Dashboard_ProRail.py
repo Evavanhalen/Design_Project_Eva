@@ -34,18 +34,31 @@ selected_columns = st.sidebar.multiselect('Select Columns to Include', all_colum
 # Filter the dataframe to include only the selected columns
 checked_df = df[selected_columns]
 
-# Sidebar filters
-st.sidebar.title('Filter Options')
-ertms_filter = st.sidebar.multiselect('ERTMS in 2031', df['ERTMS in 2031'].unique(), default=df['ERTMS in 2031'].unique())
-ertms_tranche1_filter = st.sidebar.multiselect('Tranche 1 ERTMS', df['Tranche 1 ERTMS'].unique(), default=df['Tranche 1 ERTMS'].unique())
-track_type_filter = st.sidebar.multiselect('Type of track', df['Type of track'].unique(), default=df['Type of track'].unique())
-travelers_filter = st.sidebar.multiselect('Travelers per day', df['Travelers per day'].unique(), default=df['Travelers per day'].unique())
-urban_filter = st.sidebar.multiselect('Urban/Regional/Suburban', df['Urban/Regional/Suburban'].unique(), default=df['Urban/Regional/Suburban'].unique())
-safety_filter = st.sidebar.multiselect('Safety System', df['Safety System'].unique(), default=df['Safety System'].unique())
-detection_filter = st.sidebar.multiselect('Detection system', df['Detection system'].unique(), default=df['Detection system'].unique())
-emplacement_filter = st.sidebar.multiselect('Emplacement', df['Emplacement'].unique(), default=df['Emplacement'].unique())
-number_of_tracks_filter = st.sidebar.multiselect('Number of tracks', df['Number of tracks'].unique(), default=df['Number of tracks'].unique())
-geocode_exact = st.sidebar.text_input('Geocode', '')
+# Function to create filters with include/exclude checkboxes
+def create_filter_with_checkbox(column_name, options):
+    include_filter = st.sidebar.checkbox(f"Include {column_name}", value=True, key=f"{column_name}_include")
+    filter_values = []
+    if include_filter:
+        filter_values = st.sidebar.multiselect(f'{column_name}', options, default=options, key=f"{column_name}_filter")
+    return include_filter, filter_values
+
+# Categorical filters with checkboxes
+filterable_columns = {
+    'ERTMS in 2031': df['ERTMS in 2031'].unique(),
+    'Tranche 1 ERTMS': df['Tranche 1 ERTMS'].unique(),
+    'Type of track': df['Type of track'].unique(),
+    'Travelers per day': df['Travelers per day'].unique(),
+    'Urban/Regional/Suburban': df['Urban/Regional/Suburban'].unique(),
+    'Safety System': df['Safety System'].unique(),
+    'Detection system': df['Detection system'].unique(),
+    'Emplacement': df['Emplacement'].unique(),
+    'Number of tracks': df['Number of tracks'].unique(),
+}
+
+categorical_filters = {}
+for column, options in filterable_columns.items():
+    include, values = create_filter_with_checkbox(column, options)
+    categorical_filters[column] = (include, values)
 
 # Numeric filters with include/exclude checkboxes
 def create_numeric_filter_with_checkbox(column_name, multiplier=1):
@@ -57,34 +70,36 @@ def create_numeric_filter_with_checkbox(column_name, multiplier=1):
         filter_values = st.sidebar.slider(f'{column_name}', min_val, max_val, (min_val, max_val), key=f"{column_name}_filter")
     return include_filter, filter_values
 
-slider_columns = ['Track length (km)', 'Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay',
-                  'Loam', 'Sand combination', 'Clay combination', 'Urban area',
-                  'km track', 'ATB beacon', 'Axle counters', 'Balise', 'Board signal', 'Crossing', 'Level Crossing',
-                  'Light signal', 'Matrix signal', 'Stations', 'Switches', 'Track current sections', 'Railway Viaduct',
-                  'Viaduct', 'Railway Bridge', 'Traffic Bridge', 'Railway Tunnel', 'Ecoduct']
+slider_columns = [
+    'Track length (km)', 'Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay',
+    'Loam', 'Sand combination', 'Clay combination', 'Urban area',
+    'km track', 'ATB beacon', 'Axle counters', 'Balise', 'Board signal', 'Crossing', 'Level Crossing',
+    'Light signal', 'Matrix signal', 'Stations', 'Switches', 'Track current sections', 'Railway Viaduct',
+    'Viaduct', 'Railway Bridge', 'Traffic Bridge', 'Railway Tunnel', 'Ecoduct',
+]
 
-filters = {}
+numeric_filters = {}
 for column in slider_columns:
     include, slider = create_numeric_filter_with_checkbox(column, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
-    filters[column] = (include, slider)
+    numeric_filters[column] = (include, slider)
+
+geocode_exact = st.sidebar.text_input('Geocode', '')
 
 # Apply filters
-filtered_df = checked_df[(checked_df['ERTMS in 2031'].isin(ertms_filter)) &
-                         (checked_df['Tranche 1 ERTMS'].isin(ertms_tranche1_filter)) &
-                         (checked_df['Type of track'].isin(track_type_filter)) &
-                         (checked_df['Travelers per day'].isin(travelers_filter)) &
-                         (checked_df['Urban/Regional/Suburban'].isin(urban_filter)) &
-                         (checked_df['Safety System'].isin(safety_filter)) &
-                         (checked_df['Detection system'].isin(detection_filter)) &
-                         (checked_df['Emplacement'].isin(emplacement_filter)) &
-                         (checked_df['Number of tracks'].isin(number_of_tracks_filter))]
+filtered_df = checked_df.copy()  # Start with the full dataset based on selected columns
 
+# Apply categorical filters
+for column, (include, values) in categorical_filters.items():
+    if include and column in selected_columns:
+        filtered_df = filtered_df[filtered_df[column].isin(values)]
+
+# Apply numeric filters
 def apply_numeric_filter(df, column_name, range_value, multiplier=1):
     if range_value:
         df = df[df[column_name].between(range_value[0] / multiplier, range_value[1] / multiplier)]
     return df
 
-for column, (include, range_value) in filters.items():
+for column, (include, range_value) in numeric_filters.items():
     if include and column in selected_columns:
         filtered_df = apply_numeric_filter(filtered_df, column, range_value, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
 
