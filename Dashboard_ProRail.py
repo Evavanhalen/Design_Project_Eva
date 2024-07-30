@@ -26,6 +26,14 @@ logo = Image.open(logo_path)
 # Display the logo in the sidebar
 st.sidebar.image(logo, use_column_width=True)
 
+# Sidebar for column selection
+st.sidebar.title('Include/Exclude Columns')
+all_columns = df.columns.tolist()
+selected_columns = st.sidebar.multiselect('Select Columns to Include', all_columns, default=all_columns)
+
+# Filter the dataframe to include only the selected columns
+df_selected_columns = df[selected_columns]
+
 # Sidebar filters
 st.sidebar.title('Filter Options')
 ertms_filter = st.sidebar.multiselect('ERTMS in 2031', df['ERTMS in 2031'].unique(), default=df['ERTMS in 2031'].unique())
@@ -121,26 +129,6 @@ mean_track_section = pd.concat([mean_numerical_values, mode_non_numerical_values
 
 # Filter columns to relevant features, leave out track section numbers, geocodes, names
 relevant_columns = df.loc[:, 'Emplacement':]
-
-# Define specific columns to include/exclude
-specific_columns = numerical_cols.tolist() + non_numerical_cols.tolist()
-
-# Function to create include/exclude checkboxes
-def create_include_checkbox(column_name):
-    include_key = f"{column_name}_include"
-    include = st.sidebar.checkbox(f"Include {column_name}", value=True, key=include_key)
-    return include, column_name
-
-# Apply include checkboxes to all relevant columns
-include_filters = []
-included_columns = []
-for col in specific_columns:
-    include, col_name = create_include_checkbox(col)
-    if include:
-        included_columns.append(col_name)
-
-# Filter the dataframe based on selected columns
-checked_df = df[included_columns]
 
 # Pie chart for track count
 if 'Pie Chart (Count)' in graph_options:
