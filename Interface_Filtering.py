@@ -95,6 +95,12 @@ def apply_numeric_filter(df, column_name, exact_value, range_value, multiplier=1
     return df
  
 # Display the results
+st.title('Map of Train Track Sections')
+# Load and display the ProRail logo
+map_path = '67.png'
+map = Image.open(map_path)
+st.image(map, use_column_width=True)
+
 st.title('Filtered Train Track Sections')
 st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard."
             "The table shows which track sections match the chosen criteria.")
