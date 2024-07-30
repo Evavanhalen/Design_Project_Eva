@@ -88,9 +88,11 @@ def apply_numeric_filter(df, column_name, exact_value, range_value, multiplier=1
     return df
 
 for column, (exact_value, range_value) in filters.items():
-    filtered_df = apply_numeric_filter(filtered_df, column, exact_value, range_value, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
+    if column in selected_columns:
+        filtered_df = apply_numeric_filter(filtered_df, column, exact_value, range_value, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
 
 if geocode_exact:
+    if 'Geocode' in selected_columns:
     filtered_df = filtered_df[filtered_df['Geocode'] == geocode_exact]
 
 # Display the results
@@ -218,6 +220,7 @@ A correlation matrix is a table showing correlation coefficients between sets of
 - **Positive (+)**: Indicates that as one variable increases, the other variable also tends to increase.
 - **Negative (-)**: Indicates that as one variable increases, the other variable tends to decrease.
 """)
+    numerical_cols = [col for col in checked_df.select_dtypes(include=[float, int]).columns if col in selected_columns]
     fig4, ax4 = plt.subplots(figsize=(15, 15))  # Increase the figure size
     corr_matrix = df[numerical_cols].corr()
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax4, annot_kws={"size": 8})  # Adjust font size
@@ -256,6 +259,8 @@ Histograms provide a visual representation of the distribution of numerical feat
   - **Skewness** indicates the asymmetry of the distribution.
   - **Kurtosis** indicates the "tailedness" of the distribution, or how heavy/light the tails are.
 """)
+    
+    numerical_cols = [col for col in checked_df.select_dtypes(include=[float, int]).columns if col in selected_columns]    
     fig5, axes = plt.subplots(nrows=len(numerical_cols), ncols=1, figsize=(10, len(numerical_cols) * 4))
     plt.subplots_adjust(hspace=0.5)
     for col, ax in zip(numerical_cols, axes):
