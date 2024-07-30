@@ -82,7 +82,7 @@ filtered_df = df.copy()  # Start with the full dataset
 
 # Apply categorical filters
 for column, (include, values) in categorical_filters.items():
-    if include:
+    if include and values:  # Ensure that the filter is applied only if values are selected
         filtered_df = filtered_df[filtered_df[column].isin(values)]
 
 # Apply numeric filters
@@ -92,7 +92,7 @@ def apply_numeric_filter(df, column_name, range_value, multiplier=1):
     return df
 
 for column, (include, range_value) in numeric_filters.items():
-    if include:
+    if include and range_value:  # Ensure that the filter is applied only if the range is set
         filtered_df = apply_numeric_filter(filtered_df, column, range_value, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
 
 if geocode_exact:
