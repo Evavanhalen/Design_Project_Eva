@@ -112,6 +112,147 @@ graph_options = st.multiselect(
     ['Display Numerical Means by Category', 'Display Numerical Distributions', 'Display Non-Numerical Distributions', 'Display Numerical Summary', 'Display Non-Numerical Summary Heatmap with Percentages', 'Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section', 'Correlation Matrix', 'Histograms for Distribution']
 )
 
+# Pie chart for track count
+if 'Pie Chart (Count)' in graph_options:
+    st.title('Distribution of Matching Tracks (Count)')
+    st.markdown("The pie chart shows the number of tracks that match the user-specified criteria")
+    fig1, ax1 = plt.subplots()
+    ax1.pie([filtered_tracks_count, total_tracks_count - filtered_tracks_count],
+            labels=['Matching', 'Not Matching'], autopct='%1.1f%%', startangle=90)
+    ax1.axis('equal')
+    st.pyplot(fig1)
+
+# Pie chart for km track length
+if 'Pie Chart (KM)' in graph_options:
+    st.title('Distribution of Matching Tracks (KM)')
+    st.markdown("The pie chart shows the kilometer of track that match the user-specified criteria")
+    fig2, ax2 = plt.subplots()
+    ax2.pie([filtered_km_tracks, total_km_tracks - filtered_km_tracks],
+            labels=['Matching', 'Not Matching'], autopct='%1.1f%%', startangle=90)
+    ax2.axis('equal')
+    st.pyplot(fig2)
+
+# Calculate the mean train track section
+numerical_cols = df.select_dtypes(include=[float, int]).columns
+non_numerical_cols = df.select_dtypes(exclude=[float, int]).columns.difference(['Geocode', 'To', 'From'])
+mean_numerical_values = df[numerical_cols].mean()
+mode_non_numerical_values = df[non_numerical_cols.drop(['Geocode', 'To', 'From'], errors='ignore')].mode().iloc[0]
+mean_track_section = pd.concat([mean_numerical_values, mode_non_numerical_values])
+
+
+# Mean Train Track Section
+if 'Mean Train Track Section' in graph_options:
+    st.title('Mean Train Track Section')
+    st.markdown("""
+## Mean Track Results
+
+The mean track results provide a summary of the average values for both numerical and non-numerical features of the train tracks. This information helps in understanding the typical characteristics of the track sections under consideration.
+
+**Numerical Columns:**
+- These columns contain numerical data such as track length, number of signals, etc.
+- The mean value is calculated for each numerical column.
+- This provides an idea of the central tendency of the numerical features across the dataset.
+
+**Non-Numerical Columns:**
+- These columns contain categorical data such as the type of track, safety system, etc.
+- The mode (most frequent value) is calculated for each non-numerical column.
+- This gives an insight into the most common categories or attributes in the dataset.
+
+### Key Points to Consider:
+
+**Numerical Columns:**
+- **Mean Value**: Represents the average value of the numerical features. It is calculated by summing all the values in a column and dividing by the number of values.
+- **Interpretation**: The mean value provides a central value around which the data points are distributed.
+
+**Non-Numerical Columns:**
+- **Mode Value**: Represents the most frequent value or category in the non-numerical features.
+- **Interpretation**: The mode value helps in identifying the most common category within the dataset.
+
+### Visualization and Analysis:
+
+- **Bar Charts for Numerical Columns**: Visual representations of the mean values for numerical columns help in easily comparing the average values across different features.
+- **Tables for Non-Numerical Columns**: Displaying the mode values in a table format allows for a clear understanding of the most frequent categories.
+""")
+    st.subheader('Numerical Columns')
+    fig, ax = plt.subplots()
+    mean_numerical_values.plot(kind='bar', ax=ax)
+    ax.set_ylabel('Mean Value')
+    ax.set_title('Mean Values of Numerical Columns')
+    st.pyplot(fig)
+
+# Visualization: Table for Categorical Columns
+    st.subheader('Categorical Columns')
+    st.table(mode_non_numerical_values)
+
+# Correlation Matrix of Numerical Features
+if 'Correlation Matrix' in graph_options:
+    st.title('Correlation Matrix of Numerical Features')
+    st.markdown("""
+A correlation matrix is a table showing correlation coefficients between sets of variables. Each cell in the table shows the correlation between two variables. The value is between -1 and 1.
+
+**Key Points to Consider:**
+
+**Correlation Coefficient:**
+- **+1**: Perfect positive correlation (as one variable increases, the other increases).
+- **0**: No correlation (no linear relationship between the variables).
+- **-1**: Perfect negative correlation (as one variable increases, the other decreases).
+
+**Strength of Correlation:**
+- **0.0 to 0.1**: Negligible correlation.
+- **0.1 to 0.3**: Weak correlation.
+- **0.3 to 0.5**: Moderate correlation.
+- **0.5 to 0.7**: Strong correlation.
+- **0.7 to 1.0**: Very strong correlation.
+
+**Sign of the Coefficient:**
+- **Positive (+)**: Indicates that as one variable increases, the other variable also tends to increase.
+- **Negative (-)**: Indicates that as one variable increases, the other variable tends to decrease.
+""")
+    fig4, ax4 = plt.subplots(figsize=(15, 15))  # Increase the figure size
+    corr_matrix = df[numerical_cols].corr()
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax4, annot_kws={"size": 8})  # Adjust font size
+    ax4.set_title('Correlation Matrix')
+    st.pyplot(fig4)
+
+# Histograms for Distribution of Numerical Features
+if 'Histograms for Distribution' in graph_options:
+    st.title('Histograms for Distribution of Numerical Features')
+    st.markdown("""
+## Histograms for Distribution of Numerical Features
+
+Histograms provide a visual representation of the distribution of numerical features in the dataset. They show how the data points are spread across different values, which helps in understanding the underlying patterns and distributions of the data.
+
+### Key Points to Consider:
+
+**Histogram Interpretation:**
+- **Bars**: Each bar in a histogram represents the frequency of data points that fall within a specific range.
+  - The height of the bar indicates how many data points are in that range.
+- **Bins**: The range of values is divided into bins or intervals. The width of each bin affects the granularity of the histogram.
+  - More bins provide a more detailed view, while fewer bins provide a more summarized view.
+
+**Understanding Distribution Shapes:**
+- **Normal Distribution**: A symmetric, bell-shaped curve where most data points cluster around the mean.
+- **Skewed Distribution**: 
+  - **Right-Skewed (Positive Skew)**: Most data points are concentrated on the left, with a long tail on the right.
+  - **Left-Skewed (Negative Skew)**: Most data points are concentrated on the right, with a long tail on the left.
+- **Uniform Distribution**: Data points are evenly distributed across the range.
+- **Bimodal/Multimodal Distribution**: There are two or more peaks (modes) in the distribution.
+
+### Analyzing Histograms:
+- **Central Tendency**: Identifies the central value where data points tend to cluster.
+- **Spread**: Measures how spread out the data points are (variance, standard deviation).
+- **Outliers**: Identifies data points that fall far from the main distribution.
+- **Skewness and Kurtosis**: 
+  - **Skewness** indicates the asymmetry of the distribution.
+  - **Kurtosis** indicates the "tailedness" of the distribution, or how heavy/light the tails are.
+""")
+    fig5, axes = plt.subplots(nrows=len(numerical_cols), ncols=1, figsize=(10, len(numerical_cols) * 4))
+    plt.subplots_adjust(hspace=0.5)
+    for col, ax in zip(numerical_cols, axes):
+        sns.histplot(df[col], kde=True, ax=ax)
+        ax.set_title(f'Distribution of {col}')
+    st.pyplot(fig5)
+
 # Define the function to plot all numerical features
 def plot_all_numerical_features(mean_values, std_values, categories, group_size=6):
     numerical_features = mean_values.columns
@@ -205,3 +346,27 @@ if st.button('Download Full Summary as Excel'):
         file_name='Full_Summary.xlsx',
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+
+# Save the summary table to an in-memory Excel file
+output = BytesIO()
+with pd.ExcelWriter(output, engine='openpyxl') as writer:
+    mean_track_section.to_excel(writer, sheet_name='Mean Track Section')
+output.seek(0)
+
+st.write("Summarized data is ready for download")
+
+# Provide download link for the Excel file
+st.download_button(
+    label="Download Summary Excel",
+    data=output,
+    file_name="Mean_Track_Summary.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+
+st.title('Map of Train Track Sections')
+# Load and display the ProRail logo
+map_path = '67.png'
+map = Image.open(map_path)
+st.image(map, use_column_width=True)
+
+    
