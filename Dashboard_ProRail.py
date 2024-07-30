@@ -489,7 +489,7 @@ st.write("Summarized data is ready for download")
 
 # Provide download link for the Excel file
 st.download_button(
-    label="Download Summary Excel",
+    label="Download Summary of mean track to Excel",
     data=output,
     file_name="Mean_Track_Summary.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -507,7 +507,7 @@ st.write("Summarized data is ready for download")
 
 # Provide download link for the Excel file
 st.download_button(
-    label="Download Summary Excel",
+    label="Download Summary of Urban/Suburban/Regional Tracks to Excel",
     data=output,
     file_name="Categories_Summary.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
