@@ -112,6 +112,13 @@ graph_options = st.multiselect(
     ['Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section', 'Correlation Matrix', 'Histograms for Distribution', 'Display Numerical Means by Category', 'Display Numerical Distributions', 'Display Non-Numerical Distributions', 'Display Numerical Summary']
 )
 
+# Calculate the mean train track section
+numerical_cols = df.select_dtypes(include=[float, int]).columns
+non_numerical_cols = df.select_dtypes(exclude=[float, int]).columns.difference(['Geocode', 'To', 'From'])
+mean_numerical_values = df[numerical_cols].mean()
+mode_non_numerical_values = df[non_numerical_cols.drop(['Geocode', 'To', 'From'], errors='ignore')].mode().iloc[0]
+mean_track_section = pd.concat([mean_numerical_values, mode_non_numerical_values])
+
 # Filter columns to relevant features, leave out track section numbers, geocodes, names
 relevant_columns = df.loc[:, 'Emplacement':]
 
@@ -154,13 +161,6 @@ if 'Pie Chart (KM)' in graph_options:
             labels=['Matching', 'Not Matching'], autopct='%1.1f%%', startangle=90)
     ax2.axis('equal')
     st.pyplot(fig2)
-
-# Calculate the mean train track section
-numerical_cols = df.select_dtypes(include=[float, int]).columns
-non_numerical_cols = df.select_dtypes(exclude=[float, int]).columns.difference(['Geocode', 'To', 'From'])
-mean_numerical_values = df[numerical_cols].mean()
-mode_non_numerical_values = df[non_numerical_cols.drop(['Geocode', 'To', 'From'], errors='ignore')].mode().iloc[0]
-mean_track_section = pd.concat([mean_numerical_values, mode_non_numerical_values])
 
 # Mean Train Track Section
 if 'Mean Train Track Section' in graph_options:
