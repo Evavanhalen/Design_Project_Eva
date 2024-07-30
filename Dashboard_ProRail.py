@@ -312,7 +312,7 @@ if 'Histograms for Distribution' in graph_options:
 # Excel export function
 def export_to_excel(df, filtered=True):
     with BytesIO() as buffer:
-        writer = pd.ExcelWriter(buffer, engine='xlsxwriter')
+        writer = pd.ExcelWriter(buffer, engine='openpyxl')
         df.to_excel(writer, index=False, sheet_name='Filtered Summary' if filtered else 'Full Summary')
         writer.save()
         return buffer.getvalue()
