@@ -26,85 +26,52 @@ logo = Image.open(logo_path)
 # Display the logo in the sidebar
 st.sidebar.image(logo, use_column_width=True)
 
-# Function to create filters with include/exclude checkboxes
-def create_filter_with_checkbox(column_name, options):
-    include_filter = st.sidebar.checkbox(f"Include {column_name}", value=True, key=f"{column_name}_include")
-    filter_values = []
-    if include_filter:
-        filter_values = st.sidebar.multiselect(f'{column_name}', options, default=options, key=f"{column_name}_filter")
-    return include_filter, filter_values
+# Sidebar for column selection using checkboxes
+st.sidebar.title('Include/Exclude Columns and Filters')
 
-# Categorical filters with checkboxes
-filterable_columns = {
-    'ERTMS in 2031': df['ERTMS in 2031'].unique(),
-    'Tranche 1 ERTMS': df['Tranche 1 ERTMS'].unique(),
-    'Type of track': df['Type of track'].unique(),
-    'Travelers per day': df['Travelers per day'].unique(),
-    'Urban/Regional/Suburban': df['Urban/Regional/Suburban'].unique(),
-    'Safety System': df['Safety System'].unique(),
-    'Detection system': df['Detection system'].unique(),
-    'Emplacement': df['Emplacement'].unique(),
-    'Number of tracks': df['Number of tracks'].unique(),
-}
+# Dictionary to hold the inclusion state and filter values
+column_inclusion = {}
 
-categorical_filters = {}
-for column, options in filterable_columns.items():
-    include, values = create_filter_with_checkbox(column, options)
-    categorical_filters[column] = (include, values)
+# Create checkboxes for each column to include or exclude
+for column in df.columns:
+    if df[column].dtype in ['object', 'category']:  # Categorical columns
+        include_column = st.sidebar.checkbox(f"Include {column}", value=True, key=f"{column}_include")
+        filter_values = []
+        if include_column:
+            filter_values = st.sidebar.multiselect(f'{column}', df[column].unique(), default=df[column].unique(), key=f"{column}_filter")
+        column_inclusion[column] = (include_column, filter_values)
+    else:  # Numeric columns
+        include_column = st.sidebar.checkbox(f"Include {column}", value=True, key=f"{column}_include")
+        filter_values = None
+        if include_column:
+            min_val = df[column].min()
+            max_val = df[column].max()
+            filter_values = st.sidebar.slider(f'{column}', min_val, max_val, (min_val, max_val), key=f"{column}_filter")
+        column_inclusion[column] = (include_column, filter_values)
 
-# Numeric filters with include/exclude checkboxes
-def create_numeric_filter_with_checkbox(column_name, multiplier=1):
-    include_filter = st.sidebar.checkbox(f"Include {column_name}", value=True, key=f"{column_name}_include")
-    filter_values = None
-    if include_filter:
-        min_val = df[column_name].min() * multiplier
-        max_val = df[column_name].max() * multiplier
-        filter_values = st.sidebar.slider(f'{column_name}', min_val, max_val, (min_val, max_val), key=f"{column_name}_filter")
-    return include_filter, filter_values
+# Create a filtered dataframe based on selected columns and filter conditions
+filtered_df = pd.DataFrame()
 
-slider_columns = [
-    'Track length (km)', 'Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay',
-    'Loam', 'Sand combination', 'Clay combination', 'Urban area',
-    'km track', 'ATB beacon', 'Axle counters', 'Balise', 'Board signal', 'Crossing', 'Level Crossing',
-    'Light signal', 'Matrix signal', 'Stations', 'Switches', 'Track current sections', 'Railway Viaduct',
-    'Viaduct', 'Railway Bridge', 'Traffic Bridge', 'Railway Tunnel', 'Ecoduct',
-]
+for column, (include, filter_values) in column_inclusion.items():
+    if include:
+        if column in df.select_dtypes(include=['object', 'category']).columns:
+            if filter_values:
+                filtered_df = pd.concat([filtered_df, df[df[column].isin(filter_values)][[column]]], axis=1)
+            else:
+                filtered_df = pd.concat([filtered_df, df[[column]]], axis=1)
+        else:
+            if filter_values:
+                min_val, max_val = filter_values
+                filtered_df = pd.concat([filtered_df, df[df[column].between(min_val, max_val)][[column]]], axis=1)
+            else:
+                filtered_df = pd.concat([filtered_df, df[[column]]], axis=1)
 
-numeric_filters = {}
-for column in slider_columns:
-    include, slider = create_numeric_filter_with_checkbox(column, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
-    numeric_filters[column] = (include, slider)
-
-geocode_exact = st.sidebar.text_input('Geocode', '')
-
-# Apply filters
-filtered_df = df.copy()  # Start with the full dataset
-
-# Apply categorical filters
-for column, (include, values) in categorical_filters.items():
-    if include and values:  # Ensure that the filter is applied only if values are selected
-        filtered_df = filtered_df[filtered_df[column].isin(values)]
-
-# Apply numeric filters
-def apply_numeric_filter(df, column_name, range_value, multiplier=1):
-    if range_value:
-        df = df[df[column_name].between(range_value[0] / multiplier, range_value[1] / multiplier)]
-    return df
-
-for column, (include, range_value) in numeric_filters.items():
-    if include and range_value:  # Ensure that the filter is applied only if the range is set
-        filtered_df = apply_numeric_filter(filtered_df, column, range_value, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
-
-if geocode_exact:
-    filtered_df = filtered_df[filtered_df['Geocode'] == geocode_exact]
-
-# Display the results
+# Display the filtered dataframe
 st.title('Filtered Train Track Sections')
 st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard."
             "The table shows which track sections match the chosen criteria.")
 st.write(f"Number of tracks matching criteria: {filtered_df.shape[0]}")
 st.write(filtered_df)
-
 total_tracks_count = df.shape[0]
 filtered_tracks_count = filtered_df.shape[0]
 percentage_matching_tracks = (filtered_tracks_count / total_tracks_count) * 100
