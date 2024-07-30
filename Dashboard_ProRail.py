@@ -271,7 +271,7 @@ Histograms provide a visual representation of the distribution of numerical feat
     fig5, axes = plt.subplots(nrows=len(numerical_cols), ncols=1, figsize=(10, len(numerical_cols) * 4))
     plt.subplots_adjust(hspace=0.5)
     for col, ax in zip(numerical_cols, axes):
-        sns.histplot(df[col], kde=True, ax=ax)
+        sns.histplot(df[col].dropna(), kde=True, ax=ax)
         ax.set_title(f'Distribution of {col}')
     st.pyplot(fig5)
 
