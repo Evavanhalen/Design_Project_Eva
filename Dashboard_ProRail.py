@@ -309,33 +309,22 @@ Histograms provide a visual representation of the distribution of numerical feat
 if 'Histograms for Distribution' in graph_options:
     plot_histograms(filtered_df)
 
-# Function to export DataFrame to Excel
-def export_to_excel(df, sheet_name):
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, sheet_name=sheet_name, index=False)
-    output.seek(0)
-    return output
+# Save the summary table to an in-memory Excel file
+output = BytesIO()
+with pd.ExcelWriter(output, engine='openpyxl') as writer:
+    mean_track_section.to_excel(writer, sheet_name='Mean Track Section')
+output.seek(0)
 
-# Sidebar buttons for downloading files
-if st.sidebar.button('Download Filtered Summary as Excel'):
-    filtered_df = df  # Replace with actual filtered DataFrame
-    filtered_file = export_to_excel(filtered_df, 'Filtered Summary')
-    st.sidebar.download_button(
-        label="Download Filtered Summary",
-        data=filtered_file,
-        file_name="Filtered_Summary.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+st.write("Summarized data is ready for download")
 
-if st.sidebar.button('Download Full Summary as Excel'):
-    full_file = export_to_excel(df, 'Full Summary')
-    st.sidebar.download_button(
-        label="Download Full Summary",
-        data=full_file,
-        file_name="Full_Summary.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+# Provide download link for the Excel file
+st.download_button(
+    label="Download Summary Excel",
+    data=output,
+    file_name="Mean_Track_Summary.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+
 
 # Main content
 st.write("Summarized data is ready for download")
