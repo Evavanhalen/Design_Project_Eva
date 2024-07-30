@@ -317,7 +317,7 @@ def export_to_excel(df, filtered=True):
         writer.close()
         return buffer.getvalue()
 
-# Button to download filtered data
+# Handle button for downloading filtered data
 if st.button('Download Filtered Summary as Excel'):
     filtered_file = export_to_excel(filtered_df, filtered=True)
     st.download_button(
@@ -327,7 +327,7 @@ if st.button('Download Filtered Summary as Excel'):
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
 
-# Button to download full data
+# Handle button for downloading full data
 if st.button('Download Full Summary as Excel'):
     full_file = export_to_excel(df, filtered=False)
     st.download_button(
@@ -336,7 +336,6 @@ if st.button('Download Full Summary as Excel'):
         file_name='Full_Summary.xlsx',
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-
 
 st.title('Map of Train Track Sections')
 # Load and display the ProRail logo
