@@ -314,45 +314,27 @@ def export_to_excel(df, filtered=True):
     with BytesIO() as buffer:
         writer = pd.ExcelWriter(buffer, engine='openpyxl')
         df.to_excel(writer, index=False, sheet_name='Filtered Summary' if filtered else 'Full Summary')
-        writer.close()
+        writer.save()
         return buffer.getvalue()
 
-# Function to handle file download
-def download_file(file_data, file_name):
+# Provide download link for the Excel file
+if st.button('Download Filtered Summary as Excel'):
+    filtered_file = export_to_excel(df, filtered=True)
     st.download_button(
-        label=f'Download {file_name}',
-        data=file_data,
-        file_name=file_name,
-        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        label="Download Filtered Summary",
+        data=filtered_file,
+        file_name="Filtered_Summary.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-# Track download request state
-if 'filtered_download_requested' not in st.session_state:
-    st.session_state.filtered_download_requested = False
-if 'full_download_requested' not in st.session_state:
-    st.session_state.full_download_requested = False
-
-# Button to request filtered data download
-if st.button('Request Filtered Summary Download'):
-    st.session_state.filtered_download_requested = True
-    st.session_state.full_download_requested = False
-
-# Button to request full data download
-if st.button('Request Full Summary Download'):
-    st.session_state.full_download_requested = True
-    st.session_state.filtered_download_requested = False
-
-# Handle file download based on user request
-if st.session_state.filtered_download_requested:
-    filtered_file = export_to_excel(df, filtered=True)
-    download_file(filtered_file, 'Filtered_Summary.xlsx')
-    st.session_state.filtered_download_requested = False  # Reset state after download
-
-if st.session_state.full_download_requested:
+if st.button('Download Full Summary as Excel'):
     full_file = export_to_excel(df, filtered=False)
-    download_file(full_file, 'Full_Summary.xlsx')
-    st.session_state.full_download_requested = False  # Reset state after download
-
+    st.download_button(
+        label="Download Full Summary",
+        data=full_file,
+        file_name="Full_Summary.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 st.title('Map of Train Track Sections')
 # Load and display the ProRail logo
 map_path = '67.png'
