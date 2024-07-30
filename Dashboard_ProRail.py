@@ -6,6 +6,9 @@ import seaborn as sns
 import streamlit as st
 from PIL import Image
 from io import BytesIO
+import numpy as np
+import os
+from sklearn.preprocessing import LabelEncoder
 
 # Suppress specific warnings
 warnings.filterwarnings("ignore", category=FutureWarning, module='seaborn._oldcore')
