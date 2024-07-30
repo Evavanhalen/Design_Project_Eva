@@ -98,7 +98,7 @@ def apply_numeric_filter(df, column_name, exact_value, range_value, multiplier=1
 st.title('Dashboard')
 
 # Create two columns
-col1, col2 = st.columns(2)
+col1, col2 = st.columns([2, 3])  # Adjust the ratios to fit your layout needs
 
 # Display the map in the first column
 with col1:
