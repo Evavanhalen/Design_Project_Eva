@@ -184,13 +184,17 @@ The mean track results provide a summary of the average values for both numerica
 - **Bar Charts for Numerical Columns**: Visual representations of the mean values for numerical columns help in easily comparing the average values across different features.
 - **Tables for Non-Numerical Columns**: Displaying the mode values in a table format allows for a clear understanding of the most frequent categories.
 """)
+    # Filter the numerical columns based on the selected columns
+    numerical_cols = [col for col in checked_df.select_dtypes(include=[float, int]).columns if col in selected_columns]
+    mean_numerical_values = checked_df[numerical_cols].mean()
+    
+    # Plotting the mean values for numerical columns
     st.subheader('Numerical Columns')
     fig, ax = plt.subplots()
     mean_numerical_values.plot(kind='bar', ax=ax)
     ax.set_ylabel('Mean Value')
     ax.set_title('Mean Values of Numerical Columns')
     st.pyplot(fig)
-
 # Visualization: Table for Categorical Columns
     st.subheader('Categorical Columns')
     st.table(mode_non_numerical_values)
@@ -220,8 +224,8 @@ A correlation matrix is a table showing correlation coefficients between sets of
 - **Negative (-)**: Indicates that as one variable increases, the other variable tends to decrease.
 """)
     numerical_cols = [col for col in checked_df.select_dtypes(include=[float, int]).columns if col in selected_columns]
-    fig4, ax4 = plt.subplots(figsize=(15, 15))  # Increase the figure size
     corr_matrix = df[numerical_cols].corr()
+    fig4, ax4 = plt.subplots(figsize=(15, 15))  # Increase the figure size
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax4, annot_kws={"size": 8})  # Adjust font size
     ax4.set_title('Correlation Matrix')
     st.pyplot(fig4)
