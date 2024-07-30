@@ -95,27 +95,17 @@ def apply_numeric_filter(df, column_name, exact_value, range_value, multiplier=1
     return df
  
 # Display the results
-st.title('Dashboard')
+st.title('Map of Train Track Sections')
+# Load and display the ProRail logo
+map_path = '67.png'
+map = Image.open(map_path)
+st.image(map, use_column_width=True)
 
-# Create two columns
-col1, col2 = st.columns([2, 3])  # Adjust the ratios to fit your layout needs
-
-# Display the map in the first column
-with col1:
-    st.subheader('Map of Train Track Sections')
-    # Load and display the ProRail logo
-    map_path = '67.png'
-    map = Image.open(map_path)
-    st.image(map, use_column_width=True)
-
-# Display the table in the second column
-with col2:
-    st.subheader('Filtered Train Track Sections')
-    st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard."
-                "The table shows which track sections match the chosen criteria.")
-    st.write(f"Number of tracks matching criteria: {filtered_df.shape[0]}")
-    st.write(filtered_df)
-
+st.title('Filtered Train Track Sections')
+st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard."
+            "The table shows which track sections match the chosen criteria.")
+st.write(f"Number of tracks matching criteria: {filtered_df.shape[0]}")
+st.write(filtered_df)
 # Calculate the percentage of tracks matching the criteria
 total_tracks_count = df.shape[0]
 filtered_tracks_count = filtered_df.shape[0]
