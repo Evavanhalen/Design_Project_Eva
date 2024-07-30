@@ -139,7 +139,6 @@ mean_numerical_values = df[numerical_cols].mean()
 mode_non_numerical_values = df[non_numerical_cols.drop(['Geocode', 'To', 'From'], errors='ignore')].mode().iloc[0]
 mean_track_section = pd.concat([mean_numerical_values, mode_non_numerical_values])
 
-
 # Mean Train Track Section
 if 'Mean Train Track Section' in graph_options:
     st.title('Mean Train Track Section')
@@ -290,9 +289,14 @@ def plot_all_numerical_features(mean_values, std_values, categories, group_size=
 # Display Visualization Options
 if 'Display Numerical Means by Category' in graph_options:
     st.write("**Mean Values by Category**")
-    mean_values = filtered_df.groupby('Urban/Regional/Suburban').mean()
-    std_values = filtered_df.groupby('Urban/Regional/Suburban').std()
-    categories = filtered_df['Urban/Regional/Suburban'].unique()
+    mean_numerical_categories = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].mean()
+    mode_non_numerical_categories = filtered_df.groupby('Urban/Regional/Suburban')[non_numerical_cols].agg(lambda x: x.mode()[0])
+    grouped_stds = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].std()
+
+# Combine numerical and non-numerical summaries
+summary_numerical_categories = mean_numerical_categories
+summary_non_numerical = mode_non_numerical_categories
+summary_std = grouped_stds
     plot_all_numerical_features(mean_values, std_values, categories, group_size=6)
 
 # Function to display numerical summaries
