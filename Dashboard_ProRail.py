@@ -112,6 +112,29 @@ graph_options = st.multiselect(
     ['Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section', 'Correlation Matrix', 'Histograms for Distribution', 'Display Numerical Means by Category', 'Display Numerical Distributions', 'Display Non-Numerical Distributions', 'Display Numerical Summary']
 )
 
+# Filter columns to relevant features, leave out track section numbers, geocodes, names
+relevant_columns = df.loc[:, 'Emplacement':]
+
+# Define specific columns to include/exclude
+specific_columns = numerical_cols.tolist() + non_numerical_cols.tolist()
+
+# Function to create include/exclude checkboxes
+def create_include_checkbox(column_name):
+    include_key = f"{column_name}_include"
+    include = st.sidebar.checkbox(f"Include {column_name}", value=True, key=include_key)
+    return include, column_name
+
+# Apply include checkboxes to all relevant columns
+include_filters = []
+included_columns = []
+for col in specific_columns:
+    include, col_name = create_include_checkbox(col)
+    if include:
+        included_columns.append(col_name)
+
+# Filter the dataframe based on selected columns
+checked_df = df[included_columns]
+
 # Pie chart for track count
 if 'Pie Chart (Count)' in graph_options:
     st.title('Distribution of Matching Tracks (Count)')
@@ -265,29 +288,6 @@ st.markdown("""
 
     **Note:** The data is filtered based on the selections you make in the sidebar.
 """)
-
-# Filter columns to relevant features, leave out track section numbers, geocodes, names
-relevant_columns = df.loc[:, 'Emplacement':]
-
-# Define specific columns to include/exclude
-specific_columns = numerical_cols.tolist() + non_numerical_cols.tolist()
-
-# Function to create include/exclude checkboxes
-def create_include_checkbox(column_name):
-    include_key = f"{column_name}_include"
-    include = st.sidebar.checkbox(f"Include {column_name}", value=True, key=include_key)
-    return include, column_name
-
-# Apply include checkboxes to all relevant columns
-include_filters = []
-included_columns = []
-for col in specific_columns:
-    include, col_name = create_include_checkbox(col)
-    if include:
-        included_columns.append(col_name)
-
-# Filter the dataframe based on selected columns
-checked_df = df[included_columns]
 
 # Group by 'Urban/Regional/Suburban' and calculate mean and standard deviation for numerical features and most frequent value for non-numerical features
 numerical_cols = checked_df.select_dtypes(include=[float, int]).columns
