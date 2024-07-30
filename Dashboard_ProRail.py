@@ -26,6 +26,9 @@ logo = Image.open(logo_path)
 # Display the logo in the sidebar
 st.sidebar.image(logo, use_column_width=True)
 
+# Descriptive columns that should always be included
+descriptive_columns = ['Track Section', 'Geocode', 'To', 'From']
+
 # Sidebar for column selection using checkboxes
 st.sidebar.title('Include/Exclude Columns and Filters')
 
@@ -34,6 +37,10 @@ column_inclusion = {}
 
 # Create checkboxes for each column to include or exclude
 for column in df.columns:
+    if column in descriptive_columns:
+        # Skip descriptive columns from having checkboxes
+        continue
+    
     if df[column].dtype in ['object', 'category']:  # Categorical columns
         include_column = st.sidebar.checkbox(f"Include {column}", value=True, key=f"{column}_include")
         filter_values = []
@@ -49,22 +56,25 @@ for column in df.columns:
             filter_values = st.sidebar.slider(f'{column}', min_val, max_val, (min_val, max_val), key=f"{column}_filter")
         column_inclusion[column] = (include_column, filter_values)
 
-# Create a filtered dataframe based on selected columns and filter conditions
-filtered_df = pd.DataFrame()
+# Start with descriptive columns always included
+filtered_df = df[descriptive_columns].copy()
 
+# Apply the filtering and column inclusion logic
 for column, (include, filter_values) in column_inclusion.items():
     if include:
         if column in df.select_dtypes(include=['object', 'category']).columns:
             if filter_values:
-                filtered_df = pd.concat([filtered_df, df[df[column].isin(filter_values)][[column]]], axis=1)
+                # Apply filters for categorical data
+                filtered_df = filtered_df.join(df[df[column].isin(filter_values)][[column]], how='inner')
             else:
-                filtered_df = pd.concat([filtered_df, df[[column]]], axis=1)
+                filtered_df = filtered_df.join(df[[column]], how='inner')
         else:
             if filter_values:
+                # Apply filters for numerical data
                 min_val, max_val = filter_values
-                filtered_df = pd.concat([filtered_df, df[df[column].between(min_val, max_val)][[column]]], axis=1)
+                filtered_df = filtered_df.join(df[df[column].between(min_val, max_val)][[column]], how='inner')
             else:
-                filtered_df = pd.concat([filtered_df, df[[column]]], axis=1)
+                filtered_df = filtered_df.join(df[[column]], how='inner')
 
 # Display the filtered dataframe
 st.title('Filtered Train Track Sections')
@@ -72,6 +82,8 @@ st.markdown("This dashboard allows the user to filter train track sections based
             "The table shows which track sections match the chosen criteria.")
 st.write(f"Number of tracks matching criteria: {filtered_df.shape[0]}")
 st.write(filtered_df)
+
+
 total_tracks_count = df.shape[0]
 filtered_tracks_count = filtered_df.shape[0]
 percentage_matching_tracks = (filtered_tracks_count / total_tracks_count) * 100
