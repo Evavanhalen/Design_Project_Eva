@@ -310,30 +310,35 @@ if 'Histograms for Distribution' in graph_options:
     plot_histograms(filtered_df)
 
 # Function to export DataFrame to Excel
-def export_to_excel(df, filtered=True):
-    with BytesIO() as buffer:
-        writer = pd.ExcelWriter(buffer, engine='openpyxl')
-        df.to_excel(writer, index=False, sheet_name='Filtered Summary' if filtered else 'Full Summary')
-        return buffer.getvalue()
+def export_to_excel(df, sheet_name):
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name=sheet_name, index=False)
+    output.seek(0)
+    return output
 
-# Provide download link for the Excel file
-if st.button('Download Filtered Summary as Excel'):
-    filtered_file = export_to_excel(df, filtered=True)
-    st.download_button(
+# Sidebar buttons for downloading files
+if st.sidebar.button('Download Filtered Summary as Excel'):
+    filtered_df = df  # Replace with actual filtered DataFrame
+    filtered_file = export_to_excel(filtered_df, 'Filtered Summary')
+    st.sidebar.download_button(
         label="Download Filtered Summary",
         data=filtered_file,
         file_name="Filtered_Summary.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-if st.button('Download Full Summary as Excel'):
-    full_file = export_to_excel(df, filtered=False)
-    st.download_button(
+if st.sidebar.button('Download Full Summary as Excel'):
+    full_file = export_to_excel(df, 'Full Summary')
+    st.sidebar.download_button(
         label="Download Full Summary",
         data=full_file,
         file_name="Full_Summary.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
+# Main content
+st.write("Summarized data is ready for download")
 st.title('Map of Train Track Sections')
 # Load and display the ProRail logo
 map_path = '67.png'
