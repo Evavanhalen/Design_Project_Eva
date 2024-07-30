@@ -189,8 +189,8 @@ The mean track results provide a summary of the average values for both numerica
 - **Tables for Non-Numerical Columns**: Displaying the mode values in a table format allows for a clear understanding of the most frequent categories.
 """)
     # Filter the numerical columns based on the selected columns
-    numerical_cols = [col for col in checked_df.select_dtypes(include=[float, int]).columns if col in selected_columns]
-    mean_numerical_values = checked_df[numerical_cols].mean()
+    numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns
+    mean_numerical_values = filtered_df[numerical_cols].mean()
     
     # Plotting the mean values for numerical columns
     st.subheader('Numerical Columns')
@@ -199,9 +199,11 @@ The mean track results provide a summary of the average values for both numerica
     ax.set_ylabel('Mean Value')
     ax.set_title('Mean Values of Numerical Columns')
     st.pyplot(fig)
-# Visualization: Table for Categorical Columns
+
+    # Visualization: Table for Categorical Columns
     st.subheader('Categorical Columns')
-    st.table(mode_non_numerical_values)
+    non_numerical_cols = filtered_df.select_dtypes(exclude=[float, int]).columns
+    mode_non_numerical_values = filtered_df[non_numerical_cols].mode().iloc[0]
 
 # Correlation Matrix of Numerical Features
 if 'Correlation Matrix' in graph_options:
@@ -227,7 +229,7 @@ A correlation matrix is a table showing correlation coefficients between sets of
 - **Positive (+)**: Indicates that as one variable increases, the other variable also tends to increase.
 - **Negative (-)**: Indicates that as one variable increases, the other variable tends to decrease.
 """)
-    numerical_cols = [col for col in checked_df.select_dtypes(include=[float, int]).columns if col in selected_columns]
+    numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns
     corr_matrix = df[numerical_cols].corr()
     fig4, ax4 = plt.subplots(figsize=(15, 15))  # Increase the figure size
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax4, annot_kws={"size": 8})  # Adjust font size
@@ -267,7 +269,7 @@ Histograms provide a visual representation of the distribution of numerical feat
   - **Kurtosis** indicates the "tailedness" of the distribution, or how heavy/light the tails are.
 """)
     
-    numerical_cols = [col for col in checked_df.select_dtypes(include=[float, int]).columns if col in selected_columns]    
+    numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns  
     fig5, axes = plt.subplots(nrows=len(numerical_cols), ncols=1, figsize=(10, len(numerical_cols) * 4))
     plt.subplots_adjust(hspace=0.5)
     for col, ax in zip(numerical_cols, axes):
