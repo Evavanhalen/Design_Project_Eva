@@ -109,7 +109,7 @@ st.write(f"Percentage of km tracks matching criteria: {percentage_matching_km_tr
 st.title('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section', 'Correlation Matrix', 'Histograms for Distribution', 'Display Numerical Means by Category', 'Display Numerical Distributions', 'Display Non-Numerical Distributions', 'Display Numerical Summary', 'Display Non-Numerical Summary Heatmap with Percentages' ]
+    ['Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section', 'Correlation Matrix', 'Histograms for Distribution', 'Display Numerical Means by Category', 'Display Numerical Distributions', 'Display Non-Numerical Distributions', 'Display Numerical Summary']
 )
 
 # Pie chart for track count
@@ -430,54 +430,6 @@ def plot_numerical_summary(summary, title):
 
 if 'Display Numerical Summary' in graph_options:
     plot_numerical_summary(summary_numerical, 'Mean Urban/Regional/Suburban Train Track Sections')
-
-# Define the function to plot non-numerical summary heatmap with percentages
-def plot_non_numerical_summary_heatmap_with_percentages(df, title):
-    summary_percentages = pd.DataFrame()
-
-    # Create a mapping of feature to category
-    feature_category_mapping = {
-        'Tranche 1 ERTMS': ['Yes', 'No'],
-        'ERTMS in 2031': ['Yes', 'No'],
-        'Number of tracks': ['single', 'double', 'three'],
-        'Type of track': ['primary', 'secondary', 'tertairy'],
-        'Travelers per day': ['0-1000', '1000-25000', '5000-10000'],
-        'Urban/Regional/Suburban': ['Urban', 'Regional', 'Suburban'],
-        'Safety System': ['ATB NG', 'ATB VV'],
-        'Detection system': ['Axle counters', 'Circuit'],
-    }
-
-    for feature in non_numerical_cols:
-        feature_counts = df.groupby(['Urban/Regional/Suburban', feature]).size().unstack(fill_value=0)
-        feature_percentages = feature_counts.div(feature_counts.sum(axis=1), axis=0) * 100
-        summary_percentages = pd.concat([summary_percentages, feature_percentages])
-
-    # Create new column names with category
-    new_column_names = []
-    for col in summary_percentages.columns:
-        for feature, categories in feature_category_mapping.items():
-            if col in categories:
-                new_column_names.append(f'{feature}-{col}')
-                break
-        else:
-            new_column_names.append(col)
-
-    summary_percentages.columns = new_column_names
-
-    # Create a heatmap with percentages
-    fig, ax = plt.subplots(figsize=(15, 10))
-    sns.heatmap(summary_percentages, annot=True, cmap='coolwarm', cbar=False, fmt=".1f", linewidths=.5, ax=ax)
-    ax.set_title(title, fontsize=16)
-    ax.set_ylabel('Features')
-    ax.set_xlabel('Categories')
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    st.pyplot(fig)
-    plt.close(fig)
-
-if 'Display Non-Numerical Summary Heatmap with Percentages' in graph_options:
-    plot_non_numerical_summary_heatmap_with_percentages(filtered_df, 'Most Frequent Urban/Regional/Suburban Train Track Sections with Percentages')
-
 
 # Save the summary table to an in-memory Excel file
 output = BytesIO()
