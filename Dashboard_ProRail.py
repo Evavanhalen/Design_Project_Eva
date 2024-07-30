@@ -293,11 +293,11 @@ st.markdown("""
 
 # Group by 'Urban/Regional/Suburban' and calculate mean and standard deviation for numerical features and most frequent value for non-numerical features
 numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns
-non_numerical_cols = checked_df.select_dtypes(exclude=[float, int]).columns
+non_numerical_cols = filtered_df.select_dtypes(exclude=[float, int]).columns
 
-mean_numerical = checked_df.groupby('Urban/Regional/Suburban')[numerical_cols].mean()
-mode_non_numerical = checked_df.groupby('Urban/Regional/Suburban')[non_numerical_cols].agg(lambda x: x.mode()[0])
-grouped_stds = checked_df.groupby('Urban/Regional/Suburban')[numerical_cols].std()
+mean_numerical = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].mean()
+mode_non_numerical = filtered_df.groupby('Urban/Regional/Suburban')[non_numerical_cols].agg(lambda x: x.mode()[0])
+grouped_stds = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].std()
 
 # Combine numerical and non-numerical summaries
 summary_numerical = mean_numerical
