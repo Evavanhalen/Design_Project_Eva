@@ -92,7 +92,6 @@ for column, (exact_value, range_value) in filters.items():
         filtered_df = apply_numeric_filter(filtered_df, column, exact_value, range_value, 1 if column not in ['Peat', 'Sand', 'Loamy sand', 'Sandy clay loam', 'Light clay', 'Heavy clay', 'Sand combination', 'Clay combination', 'Urban area'] else 100)
 
 if geocode_exact:
-    if 'Geocode' in selected_columns:
     filtered_df = filtered_df[filtered_df['Geocode'] == geocode_exact]
 
 # Display the results
