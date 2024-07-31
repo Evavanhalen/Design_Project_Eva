@@ -9,6 +9,10 @@ from io import BytesIO
 import numpy as np
 import os
 from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 
 # Suppress specific warnings
 warnings.filterwarnings("ignore", category=FutureWarning, module='seaborn._oldcore')
