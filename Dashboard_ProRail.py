@@ -123,7 +123,6 @@ with col1:
     st.pyplot(fig1)
     st.write(f"Total tracks: {total_tracks_count}")
     st.write(f"Tracks matching criteria: {filtered_tracks_count}")
-    st.write(f"Number of tracks matching criteria: {filtered_tracks_count}")
     st.write(f"Percentage matching criteria: {percentage_matching_tracks:.2f}%")
 
 # Pie chart for km track length
@@ -137,7 +136,6 @@ with col2:
     st.pyplot(fig2)
     st.write(f"Total km of tracks: {total_km_tracks:.2f} km")
     st.write(f"Km of tracks matching criteria: {filtered_km_tracks:.2f} km")
-    st.write(f"Number of km of tracks matching criteria: {filtered_km_tracks:.2f} km")
     st.write(f"Percentage of km tracks matching criteria: {percentage_matching_km_tracks:.2f}%")
 
 # Mean Train Track Section
