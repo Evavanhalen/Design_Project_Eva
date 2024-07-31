@@ -87,7 +87,6 @@ with st.expander("🔎 Click here to view the filtered track sections"):
 total_tracks_count = df.shape[0]
 filtered_tracks_count = filtered_df.shape[0]
 percentage_matching_tracks = (filtered_tracks_count / total_tracks_count) * 100
-st.write(f"Percentage of tracks matching criteria: {percentage_matching_tracks:.2f}%")
 
 total_km_tracks = df['km track'].sum()
 filtered_km_tracks = filtered_df['km track'].sum()
