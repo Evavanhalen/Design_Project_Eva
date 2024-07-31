@@ -104,10 +104,10 @@ graph_options = st.multiselect(
 )
 
 # Calculate the mean train track section
-numerical_cols = df.select_dtypes(include=[float, int]).columns
-non_numerical_cols = df.select_dtypes(exclude=[float, int]).columns.difference(['Geocode', 'To', 'From'])
+numerical_cols = df.select_dtypes(include=[float, int]).columns.difference(descriptive_columns)
+non_numerical_cols = df.select_dtypes(exclude=[float, int]).columns.difference(descriptive_columns)
 mean_numerical_values = df[numerical_cols].mean()
-mode_non_numerical_values = df[non_numerical_cols.drop(['Geocode', 'To', 'From'], errors='ignore')].mode().iloc[0]
+mode_non_numerical_values = df[non_numerical_cols].mode().iloc[0]
 mean_track_section = pd.concat([mean_numerical_values, mode_non_numerical_values])
 
 # Filter columns to relevant features, leave out track section numbers, geocodes, names
@@ -275,8 +275,8 @@ graph_options = st.multiselect(
     ['Display Numerical Means by Category', 'Display Numerical Distributions', 'Display Non-Numerical Distributions', 'Display Numerical Summary']
 )
 # Group by 'Urban/Regional/Suburban' and calculate mean and standard deviation for numerical features and most frequent value for non-numerical features
-numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns
-non_numerical_cols = filtered_df.select_dtypes(exclude=[float, int]).columns
+numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns.difference(descriptive_columns)
+non_numerical_cols = filtered_df.select_dtypes(exclude=[float, int]).columns.difference(descriptive_columns)
 
 mean_numerical = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].mean()
 mode_non_numerical = filtered_df.groupby('Urban/Regional/Suburban')[non_numerical_cols].agg(lambda x: x.mode()[0])
