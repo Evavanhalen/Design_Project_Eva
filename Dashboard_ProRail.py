@@ -185,8 +185,6 @@ The mean track results provide a summary of the average values for both numerica
 
     # Visualization: Table for Categorical Columns
     st.subheader('Categorical Columns')
-    non_numerical_cols = filtered_df.select_dtypes(exclude=[float, int]).columns
-    mode_non_numerical_values = filtered_df[non_numerical_cols].mode().iloc[0]
     st.table(mode_non_numerical_values)
 
 # Correlation Matrix of Numerical Features
