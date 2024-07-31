@@ -13,6 +13,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
+from sklearn.metrics import euclidean_distances
 
 # Suppress specific warnings
 warnings.filterwarnings("ignore", category=FutureWarning, module='seaborn._oldcore')
@@ -511,6 +512,50 @@ cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
 # Analyze non-numerical values by cluster, excluding descriptive columns
 non_numerical_cols_for_analysis = non_numerical_cols.difference(descriptive_columns)
 non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
+
+
+# Function to calculate similarity and match percentage
+def calculate_similarity(df, mean_vector, columns):
+    # Calculate Euclidean distances between each track and the mean vector
+    distances = euclidean_distances(df[columns], [mean_vector[columns]])
+    # Normalize the distance to get a similarity score (higher is better)
+    max_distance = np.max(distances)
+    similarity_scores = 1 - (distances / max_distance)
+    return similarity_scores.flatten()
+
+# Function to display similar tracks
+def display_similar_tracks(df, mean_vector, columns, section_type):
+    similarities = calculate_similarity(df, mean_vector, columns)
+    df['Similarity'] = similarities
+    similar_tracks = df.nlargest(10, 'Similarity')  # Show top 10 similar tracks
+    st.write(f"Top 10 tracks similar to the {section_type} Mean Track Section")
+    st.write(similar_tracks[['Track Section', 'Similarity'] + columns])
+    df.drop(columns=['Similarity'], inplace=True)  # Clean up
+
+# Sidebar and Main Content
+st.header('Track Section Similarity Analysis')
+
+# Buttons for displaying similar tracks
+if st.button('Mean Track Section in Real tracks'):
+    display_similar_tracks(df, mean_track_section, numerical_cols, 'Mean')
+
+if st.button('Urban Track Section in Real tracks'):
+    urban_mean = mean_numerical.loc['Urban']
+    display_similar_tracks(df, urban_mean, numerical_cols, 'Urban')
+
+if st.button('Suburban Track Section in Real tracks'):
+    suburban_mean = mean_numerical.loc['Suburban']
+    display_similar_tracks(df, suburban_mean, numerical_cols, 'Suburban')
+
+if st.button('Regional Track Section in Real tracks'):
+    regional_mean = mean_numerical.loc['Regional']
+    display_similar_tracks(df, regional_mean, numerical_cols, 'Regional')
+
+# For each cluster, similar implementation
+for i in range(5):
+    cluster_mean = df[df['Cluster'] == i][numerical_cols].mean()
+    if st.button(f'Cluster {i} in Real tracks'):
+        display_similar_tracks(df, cluster_mean, numerical_cols, f'Cluster {i}')
 
 st.subheader('Download Data Summaries to Excel')
 # Save the summary table to an in-memory Excel file
