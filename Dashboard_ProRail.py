@@ -515,23 +515,7 @@ non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols].agg(lambda x:
 print(cluster_analysis)
 print(non_numerical_analysis)
 
-# Save the summary table to an in-memory Excel file
-output = BytesIO()
-with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    df.to_excel(writer, sheet_name='Clustered_Data', index=False)
-    cluster_analysis.to_excel(writer, sheet_name='Cluster_Summary')
-    non_numerical_analysis.to_excel(writer, sheet_name='Non_Numerical_Summary')
-output.seek(0)
-
 st.write("Summarized data is ready for download")
-
-# Provide download link for the Excel file
-st.download_button(
-    label="Download Summary of K-Means Clusters to Excel",
-    data=output,
-    file_name="K_Means_Clusters.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
 
 # Save the summary table to an in-memory Excel file
 output = BytesIO()
@@ -539,11 +523,9 @@ with pd.ExcelWriter(output, engine='openpyxl') as writer:
     mean_track_section.to_excel(writer, sheet_name='Mean Track Section')
 output.seek(0)
 
-st.write("Summarized data is ready for download")
-
 # Provide download link for the Excel file
 st.download_button(
-    label="Download Summary of mean track to Excel",
+    label="Download Summary of Mean Track to Excel",
     data=output,
     file_name="Mean_Track_Summary.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -557,13 +539,28 @@ with pd.ExcelWriter(output, engine='openpyxl') as writer:
     summary_non_numerical.to_excel(writer, sheet_name='Non-Numerical Features')
 output.seek(0)
 
-st.write("Summarized data is ready for download")
-
 # Provide download link for the Excel file
 st.download_button(
     label="Download Summary of Urban/Suburban/Regional Tracks to Excel",
     data=output,
     file_name="Categories_Summary.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+
+# Save the summary table to an in-memory Excel file
+output = BytesIO()
+with pd.ExcelWriter(output, engine='openpyxl') as writer:
+    df.to_excel(writer, sheet_name='Clustered_Data', index=False)
+    cluster_analysis.to_excel(writer, sheet_name='Cluster_Summary')
+    non_numerical_analysis.to_excel(writer, sheet_name='Non_Numerical_Summary')
+output.seek(0)
+
+
+# Provide download link for the Excel file
+st.download_button(
+    label="Download Summary of K-Means Clusters to Excel",
+    data=output,
+    file_name="K_Means_Clusters.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
 
