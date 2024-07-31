@@ -418,7 +418,7 @@ st.markdown("The k-means clustering algorithm is applied to the preprocessed dat
 "cluster with the nearest mean, serving as a prototype of the cluster. The k-means algorithm"
 "minimizes the WCSS (Within-Cluster Sum of Square), also known as the inertia.")
 
- Select numerical columns for clustering from the included columns
+#Select numerical columns for clustering from the included columns
 numerical_cols = [col for col, (include, _) in column_inclusion.items() if include and pd.api.types.is_numeric_dtype(df[col])]
 
 if numerical_cols:
