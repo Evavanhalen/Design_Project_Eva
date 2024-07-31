@@ -518,7 +518,7 @@ print(non_numerical_analysis)
 # Save the summary table to an in-memory Excel file
 output = BytesIO()
 with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    template_df.to_excel(writer, sheet_name='Clustered_Data', index=False)
+    df.to_excel(writer, sheet_name='Clustered_Data', index=False)
     cluster_analysis.to_excel(writer, sheet_name='Cluster_Summary')
     non_numerical_analysis.to_excel(writer, sheet_name='Non_Numerical_Summary')
 output.seek(0)
