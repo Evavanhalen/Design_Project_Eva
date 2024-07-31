@@ -509,7 +509,8 @@ df['Cluster'] = clusters
 cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
 
 # Analyze non-numerical values by cluster, excluding descriptive columns
-non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols].agg(lambda x: x.value_counts().index[0])
+non_numerical_cols_for_analysis = non_numerical_cols.difference(descriptive_columns)
+non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
 
 st.subheader('Download Data Summaries to Excel')
 # Save the summary table to an in-memory Excel file
