@@ -193,20 +193,20 @@ The mean track results provide a summary of the average values for both numerica
         st.subheader('Categorical Columns')
         st.table(mode_non_numerical_values)
 
-st.subheader('Download Data Summaries to Excel')
-# Save the summary table to an in-memory Excel file
-output = BytesIO()
-with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    mean_track_section.to_excel(writer, sheet_name='Mean Track Section')
-output.seek(0)
+    st.subheader('Download Data Summaries to Excel')
+    # Save the summary table to an in-memory Excel file
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        mean_track_section.to_excel(writer, sheet_name='Mean Track Section')
+    output.seek(0)
 
-# Provide download link for the Excel file
-st.download_button(
-    label="Download Summary of Mean Track to Excel",
-    data=output,
-    file_name="Mean_Track_Summary.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
+    # Provide download link for the Excel file
+    st.download_button(
+        label="Download Summary of Mean Track to Excel",
+        data=output,
+        file_name="Mean_Track_Summary.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
 # Correlation Matrix of Numerical Features
 if 'Correlation Matrix' in graph_options:
