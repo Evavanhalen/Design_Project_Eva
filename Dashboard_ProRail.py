@@ -529,10 +529,6 @@ if numerical_cols:
         plt.suptitle('Pairplot of Clusters (Subset of Features)', y=1.02)
         st.pyplot()
 
-# Adding the cluster labels back to the original data to analyze cluster characteristics
-st.text(f"Length of df: {len(df)}")
-st.text(f"Length of clusters: {len(clusters)}")
-
 filtered_df['Cluster'] = clusters
 
 # Calculate the mean values of numeric features for each cluster
