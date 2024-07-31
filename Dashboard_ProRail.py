@@ -421,7 +421,7 @@ graph_options = st.multiselect(
     ['Elbow Curve', 'PCA Result', 'Pairplot']
 )
 
-cluster_data = template_df.drop(columns=descriptive_columns)
+cluster_data = df.drop(columns=descriptive_columns)
 # Non-numerical cols
 non_numerical_cols = ['Tranche 1 ERTMS', 'ERTMS in 2031', 'Number of tracks', 'Type of track', 'Travelers per day', 'Urban/Regional/Suburban',
                       'Safety System', 'Detection system']
