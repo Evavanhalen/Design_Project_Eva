@@ -514,8 +514,24 @@ non_numerical_cols_for_analysis = non_numerical_cols.difference(descriptive_colu
 non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
 
 
+# Start with descriptive columns always included
+filtered_df = df[descriptive_columns].copy()
 
-# Function to calculate similarity and match percentage
+# Apply the filtering and column inclusion logic
+included_numerical_cols = []
+included_non_numerical_cols = []
+
+for column, (include, filter_values) in column_inclusion.items():
+    if include:
+        if pd.api.types.is_numeric_dtype(df[column]):
+            included_numerical_cols.append(column)
+            min_val, max_val = filter_values
+            filtered_df = filtered_df.join(df[df[column].between(min_val, max_val)][[column]], how='inner')
+        else:
+            included_non_numerical_cols.append(column)
+            filtered_df = filtered_df.join(df[df[column].isin(filter_values)][[column]], how='inner')
+
+# Use the lists `included_numerical_cols` and `included_non_numerical_cols` for similarity calculations
 def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
     # Normalize numerical columns
     scaler = StandardScaler()
@@ -536,7 +552,7 @@ def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
     similarity_score = (numerical_similarity.flatten() + non_numerical_similarity) / 2
     return similarity_score
 
-# Function to display similar tracks
+# Displaying similar tracks using the updated columns
 def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, section_type):
     similarities = calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols)
     df['Similarity'] = similarities
@@ -550,19 +566,25 @@ st.header('Track Section Similarity Analysis')
 
 # Buttons for displaying similar tracks
 if st.button('Mean Track Section in Real tracks'):
-    display_similar_tracks(df, mean_track_section, numerical_cols, non_numerical_cols, 'Mean')
+    display_similar_tracks(df, mean_track_section, included_numerical_cols, included_non_numerical_cols, 'Mean')
 
 if st.button('Urban Track Section in Real tracks'):
     urban_mean = pd.concat([mean_numerical.loc['Urban'], mode_non_numerical.loc['Urban']])
-    display_similar_tracks(df, urban_mean, numerical_cols, non_numerical_cols, 'Urban')
+    display_similar_tracks(df, urban_mean, included_numerical_cols, included_non_numerical_cols, 'Urban')
 
 if st.button('Suburban Track Section in Real tracks'):
     suburban_mean = pd.concat([mean_numerical.loc['Suburban'], mode_non_numerical.loc['Suburban']])
-    display_similar_tracks(df, suburban_mean, numerical_cols, non_numerical_cols, 'Suburban')
+    display_similar_tracks(df, suburban_mean, included_numerical_cols, included_non_numerical_cols, 'Suburban')
 
 if st.button('Regional Track Section in Real tracks'):
     regional_mean = pd.concat([mean_numerical.loc['Regional'], mode_non_numerical.loc['Regional']])
-    display_similar_tracks(df, regional_mean, numerical_cols, non_numerical_cols, 'Regional')
+    display_similar_tracks(df, regional_mean, included_numerical_cols, included_non_numerical_cols, 'Regional')
+
+# For each cluster, similar implementation
+for i in range(5):
+    cluster_mean = pd.concat([cluster_analysis.loc[i], non_numerical_analysis.loc[i]])
+    if st.button(f'Cluster {i} in Real tracks'):
+        display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
 
 
 st.subheader('Download Data Summaries to Excel')
