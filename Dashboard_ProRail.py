@@ -459,7 +459,7 @@ if 'Elbow Curve' in graph_options:
     plt.ylabel('Within-Cluster Sum of Squares (WCSS)')
     plt.xticks(range(1, max_clusters + 1))
     plt.grid(True)
-    plt.show()
+    st.pyplot()
 
 # Choose the number of clusters
 k = 5
@@ -489,7 +489,7 @@ if 'PCA Result' in graph_options:  # Plot the PCA result
     plt.ylabel('Principal Component 2')
     plt.legend()
     plt.grid(True)
-    plt.show()
+    st.pyplot()
 
 # Pairplot for detailed visualization of clusters (subset of features)
 subset_features = numerical_cols[:5]  # Select first 5 numerical features for pairplot
@@ -500,7 +500,7 @@ pairplot_data['Cluster'] = pairplot_data['Cluster'].astype(str)  # Convert to st
 if 'Pairplot' in graph_options:  # Plot pairplot
     sns.pairplot(pairplot_data, hue='Cluster', palette='Set1')
     plt.suptitle('Pairplot of Clusters (Subset of Features)', y=1.02)
-    plt.show()
+    st.pyplot()
 
 # Adding the cluster labels back to the original data to analyze cluster characteristics
 df['Cluster'] = clusters
