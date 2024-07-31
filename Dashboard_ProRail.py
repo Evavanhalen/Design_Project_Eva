@@ -534,11 +534,11 @@ st.text(f"Length of clusters: {len(clusters)}")
 filtered_df['Cluster'] = clusters
 
 # Calculate the mean values of numeric features for each cluster
-cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
+cluster_analysis = filtered_df.groupby('Cluster')[numerical_cols].mean()
 
 # Analyze non-numerical values by cluster, excluding descriptive columns
 non_numerical_cols_for_analysis = non_numerical_cols.difference(descriptive_columns)
-non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
+non_numerical_analysis = filtered_df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
 
 
 # Start with descriptive columns always included
