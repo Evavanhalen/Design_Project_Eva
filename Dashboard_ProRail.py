@@ -83,7 +83,26 @@ with st.expander("Click here to view the filtered track sections"):
     st.write(f"Number of tracks matching criteria: {filtered_df.shape[0]}")
     st.write(filtered_df)
 
+# Display the filtered dataframe with a button
+st.header('Filtered Train Track Sections')
+st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard. The table shows which track sections match the chosen criteria.")
 
+if st.button('Show Filtered Track Sections'):
+    st.write(f"Number of tracks matching criteria: {filtered_df.shape[0]}")
+    st.write(filtered_df)
+
+# Using an expander with an emoji
+st.header('Filtered Train Track Sections')
+st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard. The table shows which track sections match the chosen criteria.")
+
+with st.expander("📊 Click here to view the filtered track sections"):
+    st.write(f"Number of tracks matching criteria: {filtered_df.shape[0]}")
+    st.write(filtered_df)
+
+# Using a button with an emoji
+if st.button('📊 Show Filtered Track Sections'):
+    st.write(f"Number of tracks matching criteria: {filtered_df.shape[0]}")
+    st.write(filtered_df)
 
 total_tracks_count = df.shape[0]
 filtered_tracks_count = filtered_df.shape[0]
