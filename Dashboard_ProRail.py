@@ -503,7 +503,7 @@ if 'Pairplot' in graph_options:  # Plot pairplot
     plt.show()
 
 # Adding the cluster labels back to the original data to analyze cluster characteristics
-template_df['Cluster'] = clusters
+df['Cluster'] = clusters
 
 # Calculate the mean values of numeric features for each cluster
 cluster_analysis = template_df.groupby('Cluster')[numerical_cols].mean()
