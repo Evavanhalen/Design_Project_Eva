@@ -531,7 +531,7 @@ if numerical_cols:
 st.text(f"Length of df: {len(df)}")
 st.text(f"Length of clusters: {len(clusters)}")
 
-df['Cluster'] = clusters
+filtered_df['Cluster'] = clusters
 
 # Calculate the mean values of numeric features for each cluster
 cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
