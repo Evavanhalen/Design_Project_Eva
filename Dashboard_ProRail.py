@@ -96,7 +96,7 @@ st.write(f"Km of tracks matching criteria: {filtered_km_tracks:.2f} km")
 st.write(f"Percentage of km tracks matching criteria: {percentage_matching_km_tracks:.2f}%")
 
 # Visualization Options
-st.title('Visualization Options')
+st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
     ['Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section', 'Correlation Matrix', 'Histograms for Distribution']
@@ -268,7 +268,7 @@ st.markdown("""
     **Note:** The data is filtered based on the selections you make in the sidebar.
 """)
 # Visualization Options
-st.title('Visualization Options')
+st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
     ['Display Numerical Means by Category', 'Display Numerical Distributions', 'Display Non-Numerical Distributions', 'Display Numerical Summary']
@@ -445,7 +445,7 @@ if numerical_cols:
         wcss.append(kmeans.inertia_)
 
     # Visualization Options
-    st.title('Visualization Options')
+    st.subheader('Visualization Options')
     graph_options = st.multiselect(
         'Select the graphs you want to see:',
         ['Elbow Curve', 'PCA Result', 'Pairplot']
@@ -509,8 +509,7 @@ df['Cluster'] = clusters
 cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
 
 # Analyze non-numerical values by cluster, excluding descriptive columns
-non_numerical_cols_for_analysis = df.columns.difference(numerical_cols).difference(descriptive_columns)
-non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
+non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols].agg(lambda x: x.value_counts().index[0])
 
 st.subheader('Download Data Summaries to Excel')
 # Save the summary table to an in-memory Excel file
