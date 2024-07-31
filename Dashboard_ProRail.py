@@ -499,22 +499,16 @@ if numerical_cols:
         plt.suptitle('Pairplot of Clusters (Subset of Features)', y=1.02)
         st.pyplot()
 
-    # Adding the cluster labels back to the original data to analyze cluster characteristics
-    df['Cluster'] = clusters
+# Adding the cluster labels back to the original data to analyze cluster characteristics
+df['Cluster'] = clusters
 
-    # Calculate the mean values of numeric features for each cluster
-    cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
+# Calculate the mean values of numeric features for each cluster
+cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
 
-    # Analyze non-numerical values by cluster
-    non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols].agg(lambda x: x.value_counts().index[0])
+# Analyze non-numerical values by cluster, excluding descriptive columns
+non_numerical_cols_for_analysis = df.columns.difference(numerical_cols).difference(descriptive_columns)
+non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
 
-    # Display cluster characteristics and non-numerical analysis
-    st.write(cluster_analysis)
-    st.write(non_numerical_analysis)
-else:
-    st.write("Please select at least one numerical feature for K-means clustering.")
-
-st.write("Summarized data is ready for download")
 
 # Save the summary table to an in-memory Excel file
 output = BytesIO()
