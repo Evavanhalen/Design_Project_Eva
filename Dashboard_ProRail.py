@@ -89,13 +89,9 @@ filtered_tracks_count = filtered_df.shape[0]
 percentage_matching_tracks = (filtered_tracks_count / total_tracks_count) * 100
 st.write(f"Percentage of tracks matching criteria: {percentage_matching_tracks:.2f}%")
 
-total_km_tracks = df['Track length (km)'].sum()
-filtered_km_tracks = filtered_df['Track length (km)'].sum()
+total_km_tracks = df['km track'].sum()
+filtered_km_tracks = filtered_df['km track'].sum()
 percentage_matching_km_tracks = (filtered_km_tracks / total_km_tracks) * 100
-
-st.write(f"Total km of tracks: {total_km_tracks:.2f} km")
-st.write(f"Km of tracks matching criteria: {filtered_km_tracks:.2f} km")
-st.write(f"Percentage of km tracks matching criteria: {percentage_matching_km_tracks:.2f}%")
 
 # Visualization Options
 st.subheader('Visualization Options')
