@@ -175,17 +175,22 @@ The mean track results provide a summary of the average values for both numerica
     numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns
     mean_numerical_values = filtered_df[numerical_cols].mean()
     
-    # Plotting the mean values for numerical columns
-    st.subheader('Numerical Columns')
-    fig, ax = plt.subplots()
-    mean_numerical_values.plot(kind='bar', ax=ax)
-    ax.set_ylabel('Mean Value')
-    ax.set_title('Mean Values of Numerical Columns')
-    st.pyplot(fig)
+# Create two columns for side-by-side display
+    col1, col2 = st.columns(2)
 
-    # Visualization: Table for Categorical Columns
-    st.subheader('Categorical Columns')
-    st.table(mode_non_numerical_values)
+    # Plotting the mean values for numerical columns
+    with col1:
+        st.subheader('Numerical Columns')
+        fig, ax = plt.subplots()
+        mean_numerical_values.plot(kind='bar', ax=ax)
+        ax.set_ylabel('Mean Value')
+        ax.set_title('Mean Values of Numerical Columns')
+        st.pyplot(fig)
+
+    # Displaying the mode values in a table format for non-numerical columns
+    with col2:
+        st.subheader('Categorical Columns')
+        st.table(mode_non_numerical_values)
 
 # Correlation Matrix of Numerical Features
 if 'Correlation Matrix' in graph_options:
