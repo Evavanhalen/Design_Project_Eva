@@ -113,21 +113,24 @@ mean_track_section = pd.concat([mean_numerical_values, mode_non_numerical_values
 # Filter columns to relevant features, leave out track section numbers, geocodes, names
 relevant_columns = df.loc[:, 'Emplacement':]
 
+# Create two columns
+col1, col2 = st.columns(2)
+
 # Pie chart for track count
-if 'Pie Chart (Count)' in graph_options:
-    st.title('Distribution of Matching Tracks (Count)')
+with col1:
+    st.subheader('Distribution of Matching Tracks (Count)')
     st.markdown("The pie chart shows the number of tracks that match the user-specified criteria")
-    fig1, ax1 = plt.subplots()
+    fig1, ax1 = plt.subplots(figsize=(4, 4))  # Adjust the size as needed
     ax1.pie([filtered_tracks_count, total_tracks_count - filtered_tracks_count],
             labels=['Matching', 'Not Matching'], autopct='%1.1f%%', startangle=90)
     ax1.axis('equal')
     st.pyplot(fig1)
 
 # Pie chart for km track length
-if 'Pie Chart (KM)' in graph_options:
-    st.title('Distribution of Matching Tracks (KM)')
+with col2:
+    st.subheader('Distribution of Matching Tracks (KM)')
     st.markdown("The pie chart shows the kilometer of track that match the user-specified criteria")
-    fig2, ax2 = plt.subplots()
+    fig2, ax2 = plt.subplots(figsize=(4, 4))  # Adjust the size as needed
     ax2.pie([filtered_km_tracks, total_km_tracks - filtered_km_tracks],
             labels=['Matching', 'Not Matching'], autopct='%1.1f%%', startangle=90)
     ax2.axis('equal')
