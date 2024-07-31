@@ -142,36 +142,37 @@ if 'Pie Chart (KM)' in graph_options:
 # Mean Train Track Section
 if 'Mean Train Track Section' in graph_options:
     st.title('Mean Train Track Section')
-    st.markdown("""
-## Mean Track Results
+    with st.expander("📖 Click here for a detailed explanation of Mean Track Results"):
+        st.markdown("""
+    ## Mean Track Results
 
-The mean track results provide a summary of the average values for both numerical and non-numerical features of the train tracks. This information helps in understanding the typical characteristics of the track sections under consideration.
+    The mean track results provide a summary of the average values for both numerical and non-numerical features of the train tracks. This information helps in understanding the typical characteristics of the track sections under consideration.
 
-**Numerical Columns:**
-- These columns contain numerical data such as track length, number of signals, etc.
-- The mean value is calculated for each numerical column.
-- This provides an idea of the central tendency of the numerical features across the dataset.
+    **Numerical Columns:**
+    - These columns contain numerical data such as track length, number of signals, etc.
+    - The mean value is calculated for each numerical column.
+    - This provides an idea of the central tendency of the numerical features across the dataset.
 
-**Non-Numerical Columns:**
-- These columns contain categorical data such as the type of track, safety system, etc.
-- The mode (most frequent value) is calculated for each non-numerical column.
-- This gives an insight into the most common categories or attributes in the dataset.
+    **Non-Numerical Columns:**
+    - These columns contain categorical data such as the type of track, safety system, etc.
+    - The mode (most frequent value) is calculated for each non-numerical column.
+    - This gives an insight into the most common categories or attributes in the dataset.
 
-### Key Points to Consider:
+    ### Key Points to Consider:
 
-**Numerical Columns:**
-- **Mean Value**: Represents the average value of the numerical features. It is calculated by summing all the values in a column and dividing by the number of values.
-- **Interpretation**: The mean value provides a central value around which the data points are distributed.
+    **Numerical Columns:**
+    - **Mean Value**: Represents the average value of the numerical features. It is calculated by summing all the values in a column and dividing by the number of values.
+    - **Interpretation**: The mean value provides a central value around which the data points are distributed.
 
-**Non-Numerical Columns:**
-- **Mode Value**: Represents the most frequent value or category in the non-numerical features.
-- **Interpretation**: The mode value helps in identifying the most common category within the dataset.
+    **Non-Numerical Columns:**
+    - **Mode Value**: Represents the most frequent value or category in the non-numerical features.
+    - **Interpretation**: The mode value helps in identifying the most common category within the dataset.
 
-### Visualization and Analysis:
+    ### Visualization and Analysis:
 
-- **Bar Charts for Numerical Columns**: Visual representations of the mean values for numerical columns help in easily comparing the average values across different features.
-- **Tables for Non-Numerical Columns**: Displaying the mode values in a table format allows for a clear understanding of the most frequent categories.
-""")
+    - **Bar Charts for Numerical Columns**: Visual representations of the mean values for numerical columns help in easily comparing the average values across different features.
+    - **Tables for Non-Numerical Columns**: Displaying the mode values in a table format allows for a clear understanding of the most frequent categories.
+        """)
     # Filter the numerical columns based on the selected columns
     numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns
     mean_numerical_values = filtered_df[numerical_cols].mean()
