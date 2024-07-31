@@ -409,10 +409,10 @@ if 'Display Numerical Summary' in graph_options:
     plot_numerical_summary(summary_numerical, 'Mean Urban/Regional/Suburban Train Track Sections')
 
 st.title('K-Clustering of Train Track Sections')
-st.markdown("The k-means clustering algorithm is applied to the preprocessed data. K-means clustering
-aims to partition n observations into k clusters in which each observation belongs to the
-cluster with the nearest mean, serving as a prototype of the cluster. The k-means algorithm
-minimizes the WCSS (Within-Cluster Sum of Square), also known as the inertia")
+st.markdown("The k-means clustering algorithm is applied to the preprocessed data. K-means clustering"
+"aims to partition n observations into k clusters in which each observation belongs to the"
+"cluster with the nearest mean, serving as a prototype of the cluster. The k-means algorithm"
+"minimizes the WCSS (Within-Cluster Sum of Square), also known as the inertia.")
 
 # Visualization Options
 st.title('Visualization Options')
