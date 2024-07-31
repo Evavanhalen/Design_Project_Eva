@@ -506,10 +506,10 @@ if 'Pairplot' in graph_options:  # Plot pairplot
 df['Cluster'] = clusters
 
 # Calculate the mean values of numeric features for each cluster
-cluster_analysis = template_df.groupby('Cluster')[numerical_cols].mean()
+cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
 
 # Analyze non-numerical values by cluster
-non_numerical_analysis = template_df.groupby('Cluster')[non_numerical_cols].agg(lambda x: x.value_counts().index[0])
+non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols].agg(lambda x: x.value_counts().index[0])
 
 # Display cluster characteristics and non-numerical analysis
 print(cluster_analysis)
