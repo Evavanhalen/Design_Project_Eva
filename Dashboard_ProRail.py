@@ -514,33 +514,35 @@ non_numerical_cols_for_analysis = non_numerical_cols.difference(descriptive_colu
 non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
 
 
+
 # Function to calculate similarity and match percentage
-def calculate_similarity(df, mean_vector, numerical_columns, non_numerical_columns):
-    # Calculate Euclidean distances for numerical columns
-    if numerical_columns:
-        numerical_distances = euclidean_distances(df[numerical_columns], [mean_vector[numerical_columns]])
-        max_numerical_distance = np.max(numerical_distances)
-        numerical_similarity_scores = 1 - (numerical_distances / max_numerical_distance)
-    else:
-        numerical_similarity_scores = np.zeros((df.shape[0], 1))
-    
-    # Calculate similarity for non-numerical columns
-    if non_numerical_columns:
-        non_numerical_similarity_scores = df[non_numerical_columns].apply(lambda row: (row == mean_vector[non_numerical_columns]).mean(), axis=1).values.reshape(-1, 1)
-    else:
-        non_numerical_similarity_scores = np.zeros((df.shape[0], 1))
-    
-    # Combine numerical and non-numerical similarities
-    similarity_scores = np.mean(np.hstack((numerical_similarity_scores, non_numerical_similarity_scores)), axis=1)
-    return similarity_scores
+def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
+    # Normalize numerical columns
+    scaler = StandardScaler()
+    df_numerical = scaler.fit_transform(df[numerical_cols])
+    mean_numerical = scaler.transform([mean_vector[numerical_cols]])
+
+    # Numerical similarity based on normalized Euclidean distance
+    numerical_distances = euclidean_distances(df_numerical, mean_numerical)
+    max_numerical_distance = numerical_distances.max()
+    numerical_similarity = 1 - (numerical_distances / max_numerical_distance)
+
+    # Non-numerical similarity based on mode matching
+    non_numerical_similarity = df[non_numerical_cols].apply(lambda row: sum(row == mean_vector[non_numerical_cols]), axis=1)
+    max_non_numerical_similarity = len(non_numerical_cols)
+    non_numerical_similarity = non_numerical_similarity / max_non_numerical_similarity
+
+    # Combine both similarities with equal weighting
+    similarity_score = (numerical_similarity.flatten() + non_numerical_similarity) / 2
+    return similarity_score
 
 # Function to display similar tracks
-def display_similar_tracks(df, mean_vector, numerical_columns, non_numerical_columns, section_type):
-    similarities = calculate_similarity(df, mean_vector, numerical_columns, non_numerical_columns)
+def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, section_type):
+    similarities = calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols)
     df['Similarity'] = similarities
     similar_tracks = df.nlargest(10, 'Similarity')  # Show top 10 similar tracks
     st.write(f"Top 10 tracks similar to the {section_type} Mean Track Section")
-    st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_columns) + list(non_numerical_columns)])
+    st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_cols) + list(non_numerical_cols)])
     df.drop(columns=['Similarity'], inplace=True)  # Clean up
 
 # Sidebar and Main Content
@@ -548,25 +550,20 @@ st.header('Track Section Similarity Analysis')
 
 # Buttons for displaying similar tracks
 if st.button('Mean Track Section in Real tracks'):
-    display_similar_tracks(df, mean_track_section, numerical_cols, 'Mean')
+    display_similar_tracks(df, mean_track_section, numerical_cols, non_numerical_cols, 'Mean')
 
 if st.button('Urban Track Section in Real tracks'):
-    urban_mean = mean_numerical.loc['Urban']
-    display_similar_tracks(df, urban_mean, numerical_cols, 'Urban')
+    urban_mean = pd.concat([mean_numerical.loc['Urban'], mode_non_numerical.loc['Urban']])
+    display_similar_tracks(df, urban_mean, numerical_cols, non_numerical_cols, 'Urban')
 
 if st.button('Suburban Track Section in Real tracks'):
-    suburban_mean = mean_numerical.loc['Suburban']
-    display_similar_tracks(df, suburban_mean, numerical_cols, 'Suburban')
+    suburban_mean = pd.concat([mean_numerical.loc['Suburban'], mode_non_numerical.loc['Suburban']])
+    display_similar_tracks(df, suburban_mean, numerical_cols, non_numerical_cols, 'Suburban')
 
 if st.button('Regional Track Section in Real tracks'):
-    regional_mean = mean_numerical.loc['Regional']
-    display_similar_tracks(df, regional_mean, numerical_cols, 'Regional')
+    regional_mean = pd.concat([mean_numerical.loc['Regional'], mode_non_numerical.loc['Regional']])
+    display_similar_tracks(df, regional_mean, numerical_cols, non_numerical_cols, 'Regional')
 
-# For each cluster, similar implementation
-for i in range(5):
-    cluster_mean = df[df['Cluster'] == i][numerical_cols].mean()
-    if st.button(f'Cluster {i} in Real tracks'):
-        display_similar_tracks(df, cluster_mean, numerical_cols, f'Cluster {i}')
 
 st.subheader('Download Data Summaries to Excel')
 # Save the summary table to an in-memory Excel file
