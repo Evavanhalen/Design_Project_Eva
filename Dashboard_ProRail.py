@@ -528,7 +528,9 @@ if numerical_cols:
         st.pyplot()
 
 # Adding the cluster labels back to the original data to analyze cluster characteristics
-print(len(df), len(clusters))
+st.text(f"Length of df: {len(df)}")
+st.text(f"Length of clusters: {len(clusters)}")
+
 df['Cluster'] = clusters
 
 # Calculate the mean values of numeric features for each cluster
