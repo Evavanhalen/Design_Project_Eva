@@ -515,21 +515,32 @@ non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols_for_analysis].
 
 
 # Function to calculate similarity and match percentage
-def calculate_similarity(df, mean_vector, columns):
-    # Calculate Euclidean distances between each track and the mean vector
-    distances = euclidean_distances(df[columns], [mean_vector[columns]])
-    # Normalize the distance to get a similarity score (higher is better)
-    max_distance = np.max(distances)
-    similarity_scores = 1 - (distances / max_distance)
-    return similarity_scores.flatten()
+def calculate_similarity(df, mean_vector, numerical_columns, non_numerical_columns):
+    # Calculate Euclidean distances for numerical columns
+    if numerical_columns:
+        numerical_distances = euclidean_distances(df[numerical_columns], [mean_vector[numerical_columns]])
+        max_numerical_distance = np.max(numerical_distances)
+        numerical_similarity_scores = 1 - (numerical_distances / max_numerical_distance)
+    else:
+        numerical_similarity_scores = np.zeros((df.shape[0], 1))
+    
+    # Calculate similarity for non-numerical columns
+    if non_numerical_columns:
+        non_numerical_similarity_scores = df[non_numerical_columns].apply(lambda row: (row == mean_vector[non_numerical_columns]).mean(), axis=1).values.reshape(-1, 1)
+    else:
+        non_numerical_similarity_scores = np.zeros((df.shape[0], 1))
+    
+    # Combine numerical and non-numerical similarities
+    similarity_scores = np.mean(np.hstack((numerical_similarity_scores, non_numerical_similarity_scores)), axis=1)
+    return similarity_scores
 
 # Function to display similar tracks
-def display_similar_tracks(df, mean_vector, columns, section_type):
-    similarities = calculate_similarity(df, mean_vector, columns)
+def display_similar_tracks(df, mean_vector, numerical_columns, non_numerical_columns, section_type):
+    similarities = calculate_similarity(df, mean_vector, numerical_columns, non_numerical_columns)
     df['Similarity'] = similarities
     similar_tracks = df.nlargest(10, 'Similarity')  # Show top 10 similar tracks
     st.write(f"Top 10 tracks similar to the {section_type} Mean Track Section")
-    st.write(similar_tracks[['Track Section', 'Similarity'] + columns])
+    st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_columns) + list(non_numerical_columns)])
     df.drop(columns=['Similarity'], inplace=True)  # Clean up
 
 # Sidebar and Main Content
