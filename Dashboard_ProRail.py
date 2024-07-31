@@ -79,7 +79,7 @@ st.markdown("This is an interactive Dashboard presenting different train track s
 st.header('Filtered Train Track Sections')
 st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard. The table shows which track sections match the chosen criteria.")
 
-with st.expander("📊 Click here to view the filtered track sections"):
+with st.expander("🔎 Click here to view the filtered track sections"):
     st.write(f"Number of tracks matching criteria: {filtered_df.shape[0]}")
     st.write(filtered_df)
 
