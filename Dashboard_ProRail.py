@@ -70,9 +70,12 @@ for column, (include, filter_values) in column_inclusion.items():
             filtered_df = filtered_df.join(df[df[column].between(min_val, max_val)][[column]], how='inner')
         else:
             filtered_df = filtered_df.join(df[df[column].isin(filter_values)][[column]], how='inner')
+st.title('Train Track Section Analysis')            
+st.markdown("This is an interactive Dashboard presenting different train track sections in the Netherlands. The user is able to include and exclude certain characteristics"
+            "from any statistical analysis and filter based on numerical or non-numerical values. The user can select the type of visualization they wish to see.")
 
 # Display the filtered dataframe
-st.title('Filtered Train Track Sections')
+st.header('Filtered Train Track Sections')
 st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard."
             "The table shows which track sections match the chosen criteria.")
 st.write(f"Number of tracks matching criteria: {filtered_df.shape[0]}")
@@ -252,7 +255,7 @@ Histograms provide a visual representation of the distribution of numerical feat
     st.pyplot(fig5)
 
 # Add a title and description
-st.title('Urban/Suburban/Regional Train Track Types Analysis')
+st.header('Urban/Suburban/Regional Train Track Types Analysis')
 st.markdown("""
     This dashboard allows you to analyze and visualize various features of train tracks categorized into urban, suburban, and regional types.
 
@@ -412,7 +415,7 @@ def plot_numerical_summary(summary, title):
 if 'Display Numerical Summary' in graph_options:
     plot_numerical_summary(summary_numerical, 'Mean Urban/Regional/Suburban Train Track Sections')
 
-st.title('K-Clustering of Train Track Sections')
+st.header('K-Clustering of Train Track Sections')
 st.markdown("The k-means clustering algorithm is applied to the preprocessed data. K-means clustering"
 "aims to partition n observations into k clusters in which each observation belongs to the"
 "cluster with the nearest mean, serving as a prototype of the cluster. The k-means algorithm"
@@ -509,7 +512,7 @@ cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
 non_numerical_cols_for_analysis = df.columns.difference(numerical_cols).difference(descriptive_columns)
 non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
 
-
+st.subheader('Download Data Summaries to Excel')
 # Save the summary table to an in-memory Excel file
 output = BytesIO()
 with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -543,9 +546,10 @@ st.download_button(
 # Save the summary table to an in-memory Excel file
 output = BytesIO()
 with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    df.to_excel(writer, sheet_name='Clustered_Data', index=False)
-    cluster_analysis.to_excel(writer, sheet_name='Cluster_Summary')
-    non_numerical_analysis.to_excel(writer, sheet_name='Non_Numerical_Summary')
+    if not cluster_analysis.empty:
+        cluster_analysis.to_excel(writer, sheet_name='Cluster_Summary')
+    if not non_numerical_analysis.empty:
+        non_numerical_analysis.to_excel(writer, sheet_name='Non_Numerical_Summary')
 output.seek(0)
 
 
@@ -558,7 +562,7 @@ st.download_button(
 )
 
 # Main content
-st.title('Map of Train Track Sections')
+st.subheader('Map of Train Track Sections')
 # Load and display the ProRail logo
 map_path = '67.png'
 map = Image.open(map_path)
