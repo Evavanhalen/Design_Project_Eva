@@ -418,102 +418,101 @@ st.markdown("The k-means clustering algorithm is applied to the preprocessed dat
 "cluster with the nearest mean, serving as a prototype of the cluster. The k-means algorithm"
 "minimizes the WCSS (Within-Cluster Sum of Square), also known as the inertia.")
 
-# Visualization Options
-st.title('Visualization Options')
-graph_options = st.multiselect(
-    'Select the graphs you want to see:',
-    ['Elbow Curve', 'PCA Result', 'Pairplot']
-)
+ Select numerical columns for clustering from the included columns
+numerical_cols = [col for col, (include, _) in column_inclusion.items() if include and pd.api.types.is_numeric_dtype(df[col])]
 
-cluster_data = df.drop(columns=descriptive_columns)
-# Non-numerical cols
-non_numerical_cols = ['Tranche 1 ERTMS', 'ERTMS in 2031', 'Number of tracks', 'Type of track', 'Travelers per day', 'Urban/Regional/Suburban',
-                      'Safety System', 'Detection system']
+if numerical_cols:
+    numerical_data = filtered_df[numerical_cols]
 
-# Select numerical columns for clustering
-numerical_cols = cluster_data.select_dtypes(include=['float64', 'int64']).columns
-numerical_data = cluster_data[numerical_cols]
+    # Handle missing values
+    imputer = SimpleImputer(strategy='mean')
+    imputed_data = imputer.fit_transform(numerical_data)
 
-# Handle missing values by imputing with the mean
-imputer = SimpleImputer(strategy='mean')
-imputed_data = imputer.fit_transform(numerical_data)
+    # Scale the data
+    scaler = StandardScaler()
+    scaled_data = scaler.fit_transform(imputed_data)
 
-# Scale the data
-scaler = StandardScaler()
-scaled_data = scaler.fit_transform(imputed_data)
+    # Determine the optimal number of clusters using the elbow method
+    wcss = []
+    max_clusters = 15
 
-# Determine the optimal number of clusters using the elbow method
-wcss = []
-max_clusters = 15
+    for i in range(1, max_clusters + 1):
+        kmeans = KMeans(n_clusters=i, random_state=42, n_init=10)
+        kmeans.fit(scaled_data)
+        wcss.append(kmeans.inertia_)
 
-for i in range(1, max_clusters + 1):
-    kmeans = KMeans(n_clusters=i, random_state=42, n_init=10)
-    kmeans.fit(scaled_data)
-    wcss.append(kmeans.inertia_)
+    # Visualization Options
+    st.title('Visualization Options')
+    graph_options = st.multiselect(
+        'Select the graphs you want to see:',
+        ['Elbow Curve', 'PCA Result', 'Pairplot']
+    )
 
-if 'Elbow Curve' in graph_options:
-    plt.figure(figsize=(10, 6))
-    plt.plot(range(1, max_clusters + 1), wcss, marker='o')
-    plt.title('Elbow Method for Optimal k')
-    plt.xlabel('Number of Clusters')
-    plt.ylabel('Within-Cluster Sum of Squares (WCSS)')
-    plt.xticks(range(1, max_clusters + 1))
-    plt.grid(True)
-    st.pyplot()
+    if 'Elbow Curve' in graph_options:
+        plt.figure(figsize=(10, 6))
+        plt.plot(range(1, max_clusters + 1), wcss, marker='o')
+        plt.title('Elbow Method for Optimal k')
+        plt.xlabel('Number of Clusters')
+        plt.ylabel('Within-Cluster Sum of Squares (WCSS)')
+        plt.xticks(range(1, max_clusters + 1))
+        plt.grid(True)
+        st.pyplot()
 
-# Choose the number of clusters
-k = 5
+    # Choose the number of clusters (Here fixed to 5, but you can make this dynamic)
+    k = 5
 
-# Fit the k-means model
-kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-clusters = kmeans.fit_predict(scaled_data)
+    # Fit the k-means model
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    clusters = kmeans.fit_predict(scaled_data)
 
-# Add cluster labels to the scaled data
-scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
-scaled_data_df['Cluster'] = clusters
+    # Add cluster labels to the scaled data
+    scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
+    scaled_data_df['Cluster'] = clusters
 
-# Reduce dimensions using PCA for visualization
-pca = PCA(n_components=2)
-pca_data = pca.fit_transform(scaled_data)
-pca_df = pd.DataFrame(pca_data, columns=['PC1', 'PC2'])
-pca_df['Cluster'] = clusters
+    # Reduce dimensions using PCA for visualization
+    pca = PCA(n_components=2)
+    pca_data = pca.fit_transform(scaled_data)
+    pca_df = pd.DataFrame(pca_data, columns=['PC1', 'PC2'])
+    pca_df['Cluster'] = clusters
 
-if 'PCA Result' in graph_options:  # Plot the PCA result
-    plt.figure(figsize=(10, 6))
-    for cluster in range(5):
-        plt.scatter(pca_df[pca_df['Cluster'] == cluster]['PC1'],
-                    pca_df[pca_df['Cluster'] == cluster]['PC2'],
-                    label=f'Cluster {cluster}')
-    plt.title('PCA of Clusters')
-    plt.xlabel('Principal Component 1')
-    plt.ylabel('Principal Component 2')
-    plt.legend()
-    plt.grid(True)
-    st.pyplot()
+    if 'PCA Result' in graph_options:  # Plot the PCA result
+        plt.figure(figsize=(10, 6))
+        for cluster in range(k):
+            plt.scatter(pca_df[pca_df['Cluster'] == cluster]['PC1'],
+                        pca_df[pca_df['Cluster'] == cluster]['PC2'],
+                        label=f'Cluster {cluster}')
+        plt.title('PCA of Clusters')
+        plt.xlabel('Principal Component 1')
+        plt.ylabel('Principal Component 2')
+        plt.legend()
+        plt.grid(True)
+        st.pyplot()
 
-# Pairplot for detailed visualization of clusters (subset of features)
-subset_features = numerical_cols[:5]  # Select first 5 numerical features for pairplot
-pairplot_data = pd.concat([pd.DataFrame(scaled_data, columns=numerical_cols), pd.Series(clusters, name='Cluster')], axis=1)
-pairplot_data = pairplot_data[['Cluster'] + list(subset_features)]
-pairplot_data['Cluster'] = pairplot_data['Cluster'].astype(str)  # Convert to string for better visualization
+    # Pairplot for detailed visualization of clusters (subset of features)
+    subset_features = numerical_cols[:5]  # Select first 5 numerical features for pairplot
+    pairplot_data = pd.concat([pd.DataFrame(scaled_data, columns=numerical_cols), pd.Series(clusters, name='Cluster')], axis=1)
+    pairplot_data = pairplot_data[['Cluster'] + list(subset_features)]
+    pairplot_data['Cluster'] = pairplot_data['Cluster'].astype(str)  # Convert to string for better visualization
 
-if 'Pairplot' in graph_options:  # Plot pairplot
-    sns.pairplot(pairplot_data, hue='Cluster', palette='Set1')
-    plt.suptitle('Pairplot of Clusters (Subset of Features)', y=1.02)
-    st.pyplot()
+    if 'Pairplot' in graph_options:  # Plot pairplot
+        sns.pairplot(pairplot_data, hue='Cluster', palette='Set1')
+        plt.suptitle('Pairplot of Clusters (Subset of Features)', y=1.02)
+        st.pyplot()
 
-# Adding the cluster labels back to the original data to analyze cluster characteristics
-df['Cluster'] = clusters
+    # Adding the cluster labels back to the original data to analyze cluster characteristics
+    df['Cluster'] = clusters
 
-# Calculate the mean values of numeric features for each cluster
-cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
+    # Calculate the mean values of numeric features for each cluster
+    cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
 
-# Analyze non-numerical values by cluster
-non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols].agg(lambda x: x.value_counts().index[0])
+    # Analyze non-numerical values by cluster
+    non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols].agg(lambda x: x.value_counts().index[0])
 
-# Display cluster characteristics and non-numerical analysis
-print(cluster_analysis)
-print(non_numerical_analysis)
+    # Display cluster characteristics and non-numerical analysis
+    st.write(cluster_analysis)
+    st.write(non_numerical_analysis)
+else:
+    st.write("Please select at least one numerical feature for K-means clustering.")
 
 st.write("Summarized data is ready for download")
 
@@ -565,7 +564,6 @@ st.download_button(
 )
 
 # Main content
-st.write("Summarized data is ready for download")
 st.title('Map of Train Track Sections')
 # Load and display the ProRail logo
 map_path = '67.png'
