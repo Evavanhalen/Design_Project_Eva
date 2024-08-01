@@ -96,7 +96,7 @@ percentage_matching_km_tracks = (filtered_km_tracks / total_km_tracks) * 100
 st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section', 'Histograms for Distribution']
+    ['Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section']
 )
 
 # Calculate the mean train track section
@@ -195,22 +195,28 @@ if 'Mean Train Track Section' in graph_options:
         st.table(mode_non_numerical_values)
 
         # Button to display histograms
-    if st.button('📊 Click here for statistical distribution insights'):
+ if st.button('📊 Click here for statistical distribution insights'):
         st.subheader('Histograms for Distribution of Numerical Features')
         st.markdown("""
         ## Histograms for Distribution of Numerical Features
 
         Histograms provide a visual representation of the distribution of numerical features in the dataset. They show how the data points are spread across different values, which helps in understanding the underlying patterns and distributions of the data.
         """)
-        
-        # Display histograms in a smaller size
+
+        # Display histograms in a smaller size with 3 columns
         numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns  
-        fig5, axes = plt.subplots(nrows=len(numerical_cols), ncols=1, figsize=(6, len(numerical_cols) * 2))
-        plt.subplots_adjust(hspace=0.5)
-        for col, ax in zip(numerical_cols, axes):
-            sns.histplot(filtered_df[col].dropna(), kde=True, ax=ax)
-            ax.set_title(f'Distribution of {col}')
-        st.pyplot(fig5)
+        num_cols = 3  # Number of columns for histograms
+        num_rows = (len(numerical_cols) + num_cols - 1) // num_cols  # Calculate number of rows needed
+
+        for row in range(num_rows):
+            cols = st.columns(num_cols)
+            for col_idx, col_name in enumerate(numerical_cols[row*num_cols:(row+1)*num_cols]):
+                with cols[col_idx]:
+                    fig, ax = plt.subplots(figsize=(3, 3))  # Adjust the size as needed
+                    sns.histplot(filtered_df[col_name].dropna(), kde=True, ax=ax)
+                    ax.set_title(f'{col_name}')
+                    st.pyplot(fig)
+                    plt.close(fig)
 
     st.subheader('Download Data Summaries to Excel')
     # Save the summary table to an in-memory Excel file
