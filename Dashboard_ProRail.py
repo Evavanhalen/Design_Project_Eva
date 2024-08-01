@@ -258,7 +258,7 @@ for column, (include, filter_values) in column_inclusion.items():
             included_non_numerical_cols.append(column)
 
 # Column Layout for the interactive elements
-col1, col2 = st.columns([3, 2])
+col1, col2 = st.columns([1, 4])
 
 with col1:
     st.subheader('Download Data Summaries to Excel')
