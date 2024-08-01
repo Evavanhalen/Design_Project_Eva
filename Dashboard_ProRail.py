@@ -216,22 +216,7 @@ if 'Mean Train Track Section' in graph_options:
                     st.pyplot(fig)
                     plt.close(fig)
 
-    st.subheader('Download Data Summaries to Excel')
-    # Save the summary table to an in-memory Excel file
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        mean_track_section.to_excel(writer, sheet_name='Mean Track Section')
-    output.seek(0)
-
-    # Provide download link for the Excel file
-    st.download_button(
-        label="Download Summary of Mean Track to Excel",
-        data=output,
-        file_name="Mean_Track_Summary.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-
-# Use the lists `included_numerical_cols` and `included_non_numerical_cols` for similarity calculations
+# Function Definitions (placed outside the layout)
 def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
     # Normalize numerical columns
     scaler = StandardScaler()
@@ -252,7 +237,6 @@ def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
     similarity_score = (numerical_similarity.flatten() + non_numerical_similarity) / 2
     return similarity_score
 
-# Displaying similar tracks using the updated columns
 def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, section_type):
     similarities = calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols)
     df['Similarity'] = similarities
@@ -261,12 +245,27 @@ def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, 
     st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_cols) + list(non_numerical_cols)])
     df.drop(columns=['Similarity'], inplace=True)  # Clean up
 
-    # Sidebar and Main Content
-    st.subheader('Find a real-life match')
+# Column Layout for the interactive elements
+col1, col2 = st.columns([3, 2])
 
-    # Buttons for displaying similar tracks
+with col1:
+    st.subheader('Download Data Summaries to Excel')
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        mean_track_section.to_excel(writer, sheet_name='Mean Track Section')
+    output.seek(0)
+    st.download_button(
+        label="Download Summary of Mean Track to Excel",
+        data=output,
+        file_name="Mean_Track_Summary.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+with col2:
+    st.subheader('Find a real-life match')
     if st.button('Mean Track Section in Real tracks'):
         display_similar_tracks(df, mean_track_section, included_numerical_cols, included_non_numerical_cols, 'Mean')
+
 
 # Add a title and description
 st.header('Urban/Suburban/Regional Train Track Types Analysis')
