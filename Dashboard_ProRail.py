@@ -491,11 +491,6 @@ for column, (include, filter_values) in column_inclusion.items():
 # Column Layout for the interactive elements
 col1, col2 = st.columns([2, 3])
 
-
-
-# Column Layout for the interactive elements
-col1, col2 = st.columns([2, 3])
-
 with col1:
     st.subheader('Download Data Summaries to Excel')
     output = BytesIO()
@@ -503,9 +498,9 @@ with col1:
         summary_numerical.to_excel(writer, sheet_name='Numerical Features')
         summary_std.to_excel(writer, sheet_name='Standard Deviation')
         summary_non_numerical.to_excel(writer, sheet_name='Non-Numerical Features')
-        output.seek(0)
+    output.seek(0)
     st.download_button(
-         label="Download Summary of Urban/Suburban/Regional Tracks to Excel",
+        label="Download Summary of Urban/Suburban/Regional Tracks to Excel",
         data=output,
         file_name="Categories_Summary.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -513,17 +508,17 @@ with col1:
 
 with col2:
     st.subheader('Find a real-life match')
-        if st.button('Urban Track Section in Real tracks'):
-            urban_mean = pd.concat([mean_numerical.loc['Urban'], mode_non_numerical.loc['Urban']])
-            display_similar_tracks(df, urban_mean, included_numerical_cols, included_non_numerical_cols, 'Urban')
+    if st.button('Urban Track Section in Real tracks'):
+        urban_mean = pd.concat([mean_numerical.loc['Urban'], mode_non_numerical.loc['Urban']])
+        display_similar_tracks(df, urban_mean, included_numerical_cols, included_non_numerical_cols, 'Urban')
 
-        if st.button('Suburban Track Section in Real tracks'):
-            suburban_mean = pd.concat([mean_numerical.loc['Suburban'], mode_non_numerical.loc['Suburban']])
-            display_similar_tracks(df, suburban_mean, included_numerical_cols, included_non_numerical_cols, 'Suburban')
+    if st.button('Suburban Track Section in Real tracks'):
+        suburban_mean = pd.concat([mean_numerical.loc['Suburban'], mode_non_numerical.loc['Suburban']])
+        display_similar_tracks(df, suburban_mean, included_numerical_cols, included_non_numerical_cols, 'Suburban')
 
-        if st.button('Regional Track Section in Real tracks'):
-            regional_mean = pd.concat([mean_numerical.loc['Regional'], mode_non_numerical.loc['Regional']])
-            display_similar_tracks(df, regional_mean, included_numerical_cols, included_non_numerical_cols, 'Regional')
+    if st.button('Regional Track Section in Real tracks'):
+        regional_mean = pd.concat([mean_numerical.loc['Regional'], mode_non_numerical.loc['Regional']])
+        display_similar_tracks(df, regional_mean, included_numerical_cols, included_non_numerical_cols, 'Regional')
 
 
 
