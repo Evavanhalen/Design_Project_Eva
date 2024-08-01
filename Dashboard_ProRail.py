@@ -522,27 +522,43 @@ with col2:
 
 
 
-st.header('K-Clustering of Train Track Sections')
-st.markdown("The k-means clustering algorithm is applied to the preprocessed data. K-means clustering"
-"aims to partition n observations into k clusters in which each observation belongs to the"
-"cluster with the nearest mean, serving as a prototype of the cluster. The k-means algorithm"
-"minimizes the WCSS (Within-Cluster Sum of Square), also known as the inertia.")
+# Function Definitions (placed at the beginning)
+def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
+    scaler = StandardScaler()
+    df_numerical = scaler.fit_transform(df[numerical_cols])
+    mean_numerical = scaler.transform([mean_vector[numerical_cols]])
+    numerical_distances = euclidean_distances(df_numerical, mean_numerical)
+    max_numerical_distance = numerical_distances.max()
+    numerical_similarity = 1 - (numerical_distances / max_numerical_distance)
 
-#Select numerical columns for clustering from the included columns
+    non_numerical_similarity = df[non_numerical_cols].apply(lambda row: sum(row == mean_vector[non_numerical_cols]), axis=1)
+    max_non_numerical_similarity = len(non_numerical_cols)
+    non_numerical_similarity = non_numerical_similarity / max_non_numerical_similarity
+
+    similarity_score = (numerical_similarity.flatten() + non_numerical_similarity) / 2
+    return similarity_score
+
+def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, section_type):
+    similarities = calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols)
+    df['Similarity'] = similarities
+    similar_tracks = df.nlargest(10, 'Similarity')
+    st.write(f"Top 10 tracks similar to the {section_type} Mean Track Section")
+    st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_cols) + list(non_numerical_cols)])
+    df.drop(columns=['Similarity'], inplace=True)
+
+# Main Streamlit layout
+st.header('K-Clustering of Train Track Sections')
+st.markdown("The k-means clustering algorithm is applied to the preprocessed data. K-means clustering aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster. The k-means algorithm minimizes the WCSS (Within-Cluster Sum of Square), also known as the inertia.")
+
 numerical_cols = [col for col, (include, _) in column_inclusion.items() if include and pd.api.types.is_numeric_dtype(df[col])]
 
 if numerical_cols:
     numerical_data = filtered_df[numerical_cols]
-
-    # Handle missing values
     imputer = SimpleImputer(strategy='mean')
     imputed_data = imputer.fit_transform(numerical_data)
-
-    # Scale the data
     scaler = StandardScaler()
     scaled_data = scaler.fit_transform(imputed_data)
 
-    # Determine the optimal number of clusters using the elbow method
     wcss = []
     max_clusters = 15
 
@@ -551,36 +567,22 @@ if numerical_cols:
         kmeans.fit(scaled_data)
         wcss.append(kmeans.inertia_)
 
-    # Visualization Options
-    st.subheader('Visualization Options')
-    graph_options = st.multiselect(
-        'Select the graphs you want to see:',
-        ['PCA Result', 'Pairplot']
-    )
-
-    # Choose the number of clusters (Here fixed to 5, but you can make this dynamic)
     k = 5
-
-    # Fit the k-means model
     kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
     clusters = kmeans.fit_predict(scaled_data)
 
-    # Add cluster labels to the scaled data
     scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
     scaled_data_df['Cluster'] = clusters
 
-    # Reduce dimensions using PCA for visualization
     pca = PCA(n_components=2)
     pca_data = pca.fit_transform(scaled_data)
     pca_df = pd.DataFrame(pca_data, columns=['PC1', 'PC2'])
     pca_df['Cluster'] = clusters
 
-    if 'PCA Result' in graph_options:  # Plot the PCA result
+    if 'PCA Result' in graph_options:
         plt.figure(figsize=(10, 6))
         for cluster in range(k):
-            plt.scatter(pca_df[pca_df['Cluster'] == cluster]['PC1'],
-                        pca_df[pca_df['Cluster'] == cluster]['PC2'],
-                        label=f'Cluster {cluster}')
+            plt.scatter(pca_df[pca_df['Cluster'] == cluster]['PC1'], pca_df[pca_df['Cluster'] == cluster]['PC2'], label=f'Cluster {cluster}')
         plt.title('PCA of Clusters')
         plt.xlabel('Principal Component 1')
         plt.ylabel('Principal Component 2')
@@ -588,115 +590,47 @@ if numerical_cols:
         plt.grid(True)
         st.pyplot()
 
-    # Pairplot for detailed visualization of clusters (subset of features)
-    subset_features = numerical_cols[:5]  # Select first 5 numerical features for pairplot
+    subset_features = numerical_cols[:5]
     pairplot_data = pd.concat([pd.DataFrame(scaled_data, columns=numerical_cols), pd.Series(clusters, name='Cluster')], axis=1)
     pairplot_data = pairplot_data[['Cluster'] + list(subset_features)]
-    pairplot_data['Cluster'] = pairplot_data['Cluster'].astype(str)  # Convert to string for better visualization
+    pairplot_data['Cluster'] = pairplot_data['Cluster'].astype(str)
 
-    if 'Pairplot' in graph_options:  # Plot pairplot
+    if 'Pairplot' in graph_options:
         sns.pairplot(pairplot_data, hue='Cluster', palette='Set1')
         plt.suptitle('Pairplot of Clusters (Subset of Features)', y=1.02)
         st.pyplot()
 
 filtered_df['Cluster'] = clusters
 
-# Calculate the mean values of numeric features for each cluster
 cluster_analysis = filtered_df.groupby('Cluster')[numerical_cols].mean()
-
-# Analyze non-numerical values by cluster, excluding descriptive columns
 non_numerical_cols_for_analysis = non_numerical_cols.difference(descriptive_columns)
 non_numerical_analysis = filtered_df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
 
+# Column Layout for the interactive elements
+col1, col2 = st.columns([2, 3])
 
-# Start with descriptive columns always included
-filtered_df = df[descriptive_columns].copy()
+with col1:
+    st.subheader('Download Data Summaries to Excel')
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        if not cluster_analysis.empty:
+            cluster_analysis.to_excel(writer, sheet_name='Cluster_Summary')
+        if not non_numerical_analysis.empty:
+            non_numerical_analysis.to_excel(writer, sheet_name='Non_Numerical_Summary')
+    output.seek(0)
+    st.download_button(
+        label="Download Summary of K-Means Clusters to Excel",
+        data=output,
+        file_name="K_Means_Clusters.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
-# Apply the filtering and column inclusion logic
-included_numerical_cols = []
-included_non_numerical_cols = []
-
-for column, (include, filter_values) in column_inclusion.items():
-    if include:
-        if pd.api.types.is_numeric_dtype(df[column]):
-            included_numerical_cols.append(column)
-            min_val, max_val = filter_values
-            filtered_df = filtered_df.join(df[df[column].between(min_val, max_val)][[column]], how='inner')
-        else:
-            included_non_numerical_cols.append(column)
-            filtered_df = filtered_df.join(df[df[column].isin(filter_values)][[column]], how='inner')
-
-# Save the summary table to an in-memory Excel file
-output = BytesIO()
-with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    if not cluster_analysis.empty:
-        cluster_analysis.to_excel(writer, sheet_name='Cluster_Summary')
-    if not non_numerical_analysis.empty:
-        non_numerical_analysis.to_excel(writer, sheet_name='Non_Numerical_Summary')
-output.seek(0)
-
-# Provide download link for the Excel file
-st.download_button(
-    label="Download Summary of K-Means Clusters to Excel",
-    data=output,
-    file_name="K_Means_Clusters.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
-# Use the lists `included_numerical_cols` and `included_non_numerical_cols` for similarity calculations
-def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
-    # Normalize numerical columns
-    scaler = StandardScaler()
-    df_numerical = scaler.fit_transform(df[numerical_cols])
-    mean_numerical = scaler.transform([mean_vector[numerical_cols]])
-
-    # Numerical similarity based on normalized Euclidean distance
-    numerical_distances = euclidean_distances(df_numerical, mean_numerical)
-    max_numerical_distance = numerical_distances.max()
-    numerical_similarity = 1 - (numerical_distances / max_numerical_distance)
-
-    # Non-numerical similarity based on mode matching
-    non_numerical_similarity = df[non_numerical_cols].apply(lambda row: sum(row == mean_vector[non_numerical_cols]), axis=1)
-    max_non_numerical_similarity = len(non_numerical_cols)
-    non_numerical_similarity = non_numerical_similarity / max_non_numerical_similarity
-
-    # Combine both similarities with equal weighting
-    similarity_score = (numerical_similarity.flatten() + non_numerical_similarity) / 2
-    return similarity_score
-
-# Displaying similar tracks using the updated columns
-def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, section_type):
-    similarities = calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols)
-    df['Similarity'] = similarities
-    similar_tracks = df.nlargest(10, 'Similarity')  # Show top 10 similar tracks
-    st.write(f"Top 10 tracks similar to the {section_type} Mean Track Section")
-    st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_cols) + list(non_numerical_cols)])
-    df.drop(columns=['Similarity'], inplace=True)  # Clean up
-
-# Sidebar and Main Content
-st.header('Track Section Similarity Analysis')
-
-# Buttons for displaying similar tracks
-if st.button('Mean Track Section in Real tracks'):
-    display_similar_tracks(df, mean_track_section, included_numerical_cols, included_non_numerical_cols, 'Mean')
-
-if st.button('Urban Track Section in Real tracks'):
-    urban_mean = pd.concat([mean_numerical.loc['Urban'], mode_non_numerical.loc['Urban']])
-    display_similar_tracks(df, urban_mean, included_numerical_cols, included_non_numerical_cols, 'Urban')
-
-if st.button('Suburban Track Section in Real tracks'):
-    suburban_mean = pd.concat([mean_numerical.loc['Suburban'], mode_non_numerical.loc['Suburban']])
-    display_similar_tracks(df, suburban_mean, included_numerical_cols, included_non_numerical_cols, 'Suburban')
-
-if st.button('Regional Track Section in Real tracks'):
-    regional_mean = pd.concat([mean_numerical.loc['Regional'], mode_non_numerical.loc['Regional']])
-    display_similar_tracks(df, regional_mean, included_numerical_cols, included_non_numerical_cols, 'Regional')
-
-# For each cluster, similar implementation
-for i in range(5):
-    cluster_mean = pd.concat([cluster_analysis.loc[i], non_numerical_analysis.loc[i]])
-    if st.button(f'Cluster {i} in Real tracks'):
-        display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
-
+with col2:
+    st.subheader('Find a real-life match')
+    for i in range(5):
+        cluster_mean = pd.concat([cluster_analysis.loc[i], non_numerical_analysis.loc[i]])
+        if st.button(f'Cluster {i} in Real tracks'):
+            display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
 
 # Main content
 st.subheader('Map of Train Track Sections')
