@@ -247,7 +247,7 @@ st.markdown("""
 st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Numerical Means by Category', 'Display Non-Numerical Distributions', 'Display Numerical Summary']
+    ['Numerical Means by Category', 'Non-Numerical Modes by Category', 'Display Numerical Summary']
 )
 # Group by 'Urban/Regional/Suburban' and calculate mean and standard deviation for numerical features and most frequent value for non-numerical features
 numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns.difference(descriptive_columns)
@@ -342,7 +342,7 @@ if 'Numerical Means by Category' in graph_options:
             plot_distributions(remaining_cols, filtered_df, 'Distributions of Remaining Numerical Features')
 
 # Display mode of non-numerical columns by category
-if 'Display Non-Numerical Distributions' in graph_options:
+if 'Non-Numerical Modes by Category' in graph_options:
     st.subheader('Non-Numerical Feature Modes')
     st.write("Below are the most common values (mode) for the non-numerical features across different track categories.")
     st.table(mode_non_numerical)
