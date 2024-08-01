@@ -447,22 +447,85 @@ if 'Numerical Summary' in graph_options:
     st.subheader('Summary of Numerical Features by Category')
     plot_numerical_summary(summary_numerical, 'Mean Urban/Regional/Suburban Train Track Sections')
 
-st.subheader('Download Data Summaries to Excel')
-# Save the summary table to an in-memory Excel file
-output = BytesIO()
-with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    summary_numerical.to_excel(writer, sheet_name='Numerical Features')
-    summary_std.to_excel(writer, sheet_name='Standard Deviation')
-    summary_non_numerical.to_excel(writer, sheet_name='Non-Numerical Features')
-output.seek(0)
+# Function Definitions (placed outside the layout)
+def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
+    # Normalize numerical columns
+    scaler = StandardScaler()
+    df_numerical = scaler.fit_transform(df[numerical_cols])
+    mean_numerical = scaler.transform([mean_vector[numerical_cols]])
 
-# Provide download link for the Excel file
-st.download_button(
-    label="Download Summary of Urban/Suburban/Regional Tracks to Excel",
-    data=output,
-    file_name="Categories_Summary.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
+    # Numerical similarity based on normalized Euclidean distance
+    numerical_distances = euclidean_distances(df_numerical, mean_numerical)
+    max_numerical_distance = numerical_distances.max()
+    numerical_similarity = 1 - (numerical_distances / max_numerical_distance)
+
+    # Non-numerical similarity based on mode matching
+    non_numerical_similarity = df[non_numerical_cols].apply(lambda row: sum(row == mean_vector[non_numerical_cols]), axis=1)
+    max_non_numerical_similarity = len(non_numerical_cols)
+    non_numerical_similarity = non_numerical_similarity / max_non_numerical_similarity
+
+    # Combine both similarities with equal weighting
+    similarity_score = (numerical_similarity.flatten() + non_numerical_similarity) / 2
+    return similarity_score
+
+def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, section_type):
+    similarities = calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols)
+    df['Similarity'] = similarities
+    similar_tracks = df.nlargest(10, 'Similarity')  # Show top 10 similar tracks
+    st.write(f"Top 10 tracks similar to the {section_type} Mean Track Section")
+    st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_cols) + list(non_numerical_cols)])
+    df.drop(columns=['Similarity'], inplace=True)  # Clean up
+
+# Filtering and inclusion logic (this should be placed before the column layout to ensure variables are available)
+included_numerical_cols = []  # Initialize as an empty list
+included_non_numerical_cols = []  # Initialize as an empty list
+
+# Assume column_inclusion is a dictionary that has been populated earlier in the script
+for column, (include, filter_values) in column_inclusion.items():
+    if include:
+        if pd.api.types.is_numeric_dtype(df[column]):
+            included_numerical_cols.append(column)
+        else:
+            included_non_numerical_cols.append(column)
+
+# Column Layout for the interactive elements
+col1, col2 = st.columns([2, 3])
+
+
+
+# Column Layout for the interactive elements
+col1, col2 = st.columns([2, 3])
+
+with col1:
+    st.subheader('Download Data Summaries to Excel')
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        summary_numerical.to_excel(writer, sheet_name='Numerical Features')
+        summary_std.to_excel(writer, sheet_name='Standard Deviation')
+        summary_non_numerical.to_excel(writer, sheet_name='Non-Numerical Features')
+        output.seek(0)
+    st.download_button(
+         label="Download Summary of Urban/Suburban/Regional Tracks to Excel",
+        data=output,
+        file_name="Categories_Summary.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+with col2:
+    st.subheader('Find a real-life match')
+        if st.button('Urban Track Section in Real tracks'):
+            urban_mean = pd.concat([mean_numerical.loc['Urban'], mode_non_numerical.loc['Urban']])
+            display_similar_tracks(df, urban_mean, included_numerical_cols, included_non_numerical_cols, 'Urban')
+
+        if st.button('Suburban Track Section in Real tracks'):
+            suburban_mean = pd.concat([mean_numerical.loc['Suburban'], mode_non_numerical.loc['Suburban']])
+            display_similar_tracks(df, suburban_mean, included_numerical_cols, included_non_numerical_cols, 'Suburban')
+
+        if st.button('Regional Track Section in Real tracks'):
+            regional_mean = pd.concat([mean_numerical.loc['Regional'], mode_non_numerical.loc['Regional']])
+            display_similar_tracks(df, regional_mean, included_numerical_cols, included_non_numerical_cols, 'Regional')
+
+
 
 st.header('K-Clustering of Train Track Sections')
 st.markdown("The k-means clustering algorithm is applied to the preprocessed data. K-means clustering"
