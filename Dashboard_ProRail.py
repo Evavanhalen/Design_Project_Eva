@@ -195,7 +195,7 @@ if 'Mean Train Track Section' in graph_options:
         st.table(mode_non_numerical_values)
 
         # Button to display histograms
-    if st.expander('📊 Click here for statistical distribution insights'):
+    with st.expander('📊 Click here for statistical distribution insights'):
         st.subheader('Histograms for Distribution of Numerical Features')
         st.markdown("""
         ## Histograms for Distribution of Numerical Features
