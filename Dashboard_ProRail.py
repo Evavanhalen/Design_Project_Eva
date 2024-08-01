@@ -247,7 +247,7 @@ st.markdown("""
 st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Display Numerical Means by Category', 'Display Numerical Distributions', 'Display Non-Numerical Distributions', 'Display Numerical Summary']
+    ['Numerical Means by Category', 'Display Non-Numerical Distributions', 'Display Numerical Summary']
 )
 # Group by 'Urban/Regional/Suburban' and calculate mean and standard deviation for numerical features and most frequent value for non-numerical features
 numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns.difference(descriptive_columns)
@@ -297,50 +297,49 @@ def plot_all_numerical_features(mean_values, std_values, categories, group_size=
         plt.close(fig)
         
 
-# Assuming mean_numerical and grouped_stds are DataFrames with the mean and std values of numerical features respectively
-if 'Display Numerical Means by Category' in graph_options:
+if 'Numerical Means by Category' in graph_options:
     plot_all_numerical_features(mean_numerical, grouped_stds, mean_numerical.index)
 
-## Plotting the distributions
-# Define the function to plot distributions
-def plot_distributions(columns, df, title, cols=2):
-    num_plots = len(columns)
-    rows = (num_plots // cols) + (num_plots % cols > 0)  # Calculate number of rows needed
+    # Add an expander for numerical distributions
+    with st.expander("📊 Click here for detailed numerical distributions"):
+        # Define the function to plot distributions
+        def plot_distributions(columns, df, title, cols=3):
+            num_plots = len(columns)
+            rows = (num_plots // cols) + (num_plots % cols > 0)  # Calculate number of rows needed
 
-    fig, axes = plt.subplots(rows, cols, figsize=(12, 5 * rows))
-    axes = axes.flatten()
+            fig, axes = plt.subplots(rows, cols, figsize=(12, 5 * rows))
+            axes = axes.flatten()
 
-    for i, col in enumerate(columns):
-        sns.boxplot(x='Urban/Regional/Suburban', y=col, data=df, ax=axes[i])
-        axes[i].set_title(f'Distribution of {col}', fontsize=10, pad=10)
-        axes[i].set_ylabel(col, fontsize=8)
-        axes[i].set_xlabel('')
-        axes[i].tick_params(axis='x', labelsize=6)
+            for i, col in enumerate(columns):
+                sns.boxplot(x='Urban/Regional/Suburban', y=col, data=df, ax=axes[i])
+                axes[i].set_title(f'Distribution of {col}', fontsize=10, pad=10)
+                axes[i].set_ylabel(col, fontsize=8)
+                axes[i].set_xlabel('')
+                axes[i].tick_params(axis='x', labelsize=6)
 
-    # Remove any empty subplots
-    for j in range(i + 1, len(axes)):
-        fig.delaxes(axes[j])
+            # Remove any empty subplots
+            for j in range(i + 1, len(axes)):
+                fig.delaxes(axes[j])
 
-    plt.tight_layout(pad=3.1)  # Adjust the padding between subplots
-    fig.subplots_adjust(top=0.9)  # Adjust the top spacing to make room for the main title
-    fig.suptitle(title, fontsize=16)  # Main title
-    st.pyplot(fig)
-    plt.close(fig)
+            plt.tight_layout(pad=3.1)  # Adjust the padding between subplots
+            fig.subplots_adjust(top=0.9)  # Adjust the top spacing to make room for the main title
+            fig.suptitle(title, fontsize=16)  # Main title
+            st.pyplot(fig)
+            plt.close(fig)
 
-# Split numerical columns into smaller groups for better readability
-group_size = 6  # Number of subplots per figure
+        # Split numerical columns into smaller groups for better readability
+        group_size = 6  # Number of subplots per figure
 
-# Create subfigures for each group
-if 'Display Numerical Distributions' in graph_options:
-    for start_index in range(0, len(numerical_cols), group_size):
-        end_index = min(start_index + group_size, len(numerical_cols))
-        group = numerical_cols[start_index:end_index]
-        plot_distributions(group, filtered_df, f'Distributions_of_Numerical_Features_{start_index + 1}_to_{end_index}')
+        # Create subfigures for each group
+        for start_index in range(0, len(numerical_cols), group_size):
+            end_index = min(start_index + group_size, len(numerical_cols))
+            group = numerical_cols[start_index:end_index]
+            plot_distributions(group, filtered_df, f'Distributions of Numerical Features {start_index + 1} to {end_index}')
 
-    # Handle the remaining columns if the division is not perfect
-    if end_index < len(numerical_cols):
-        remaining_cols = numerical_cols[end_index:]
-        plot_distributions(remaining_cols, filtered_df, 'Distributions_of_Remaining_Numerical_Features')
+        # Handle the remaining columns if the division is not perfect
+        if end_index < len(numerical_cols):
+            remaining_cols = numerical_cols[end_index:]
+            plot_distributions(remaining_cols, filtered_df, 'Distributions of Remaining Numerical Features')
 
 # Define the function to plot non-numerical distributions
 def plot_non_numerical_distributions(columns, df, title, cols=2):
