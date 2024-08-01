@@ -247,7 +247,7 @@ st.markdown("""
 st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Numerical Means by Category', 'Non-Numerical Modes by Category', 'Display Numerical Summary']
+    ['Numerical Means by Category', 'Non-Numerical Modes by Category', 'Numerical Summary']
 )
 # Group by 'Urban/Regional/Suburban' and calculate mean and standard deviation for numerical features and most frequent value for non-numerical features
 numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns.difference(descriptive_columns)
@@ -394,8 +394,26 @@ def plot_numerical_summary(summary, title):
     st.pyplot(fig)
     plt.close(fig)
 
-if 'Display Numerical Summary' in graph_options:
+if 'Numerical Summary' in graph_options:
+    st.subheader('Summary of Numerical Features by Category')
     plot_numerical_summary(summary_numerical, 'Mean Urban/Regional/Suburban Train Track Sections')
+
+st.subheader('Download Data Summaries to Excel')
+# Save the summary table to an in-memory Excel file
+output = BytesIO()
+with pd.ExcelWriter(output, engine='openpyxl') as writer:
+    summary_numerical.to_excel(writer, sheet_name='Numerical Features')
+    summary_std.to_excel(writer, sheet_name='Standard Deviation')
+    summary_non_numerical.to_excel(writer, sheet_name='Non-Numerical Features')
+output.seek(0)
+
+# Provide download link for the Excel file
+st.download_button(
+    label="Download Summary of Urban/Suburban/Regional Tracks to Excel",
+    data=output,
+    file_name="Categories_Summary.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
 
 st.header('K-Clustering of Train Track Sections')
 st.markdown("The k-means clustering algorithm is applied to the preprocessed data. K-means clustering"
@@ -566,23 +584,6 @@ for i in range(5):
     if st.button(f'Cluster {i} in Real tracks'):
         display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
 
-
-st.subheader('Download Data Summaries to Excel')
-# Save the summary table to an in-memory Excel file
-output = BytesIO()
-with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    summary_numerical.to_excel(writer, sheet_name='Numerical Features')
-    summary_std.to_excel(writer, sheet_name='Standard Deviation')
-    summary_non_numerical.to_excel(writer, sheet_name='Non-Numerical Features')
-output.seek(0)
-
-# Provide download link for the Excel file
-st.download_button(
-    label="Download Summary of Urban/Suburban/Regional Tracks to Excel",
-    data=output,
-    file_name="Categories_Summary.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
 
 # Save the summary table to an in-memory Excel file
 output = BytesIO()
