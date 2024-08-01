@@ -121,7 +121,7 @@ st.write(f"Percentage of km tracks matching criteria: {percentage_matching_km_tr
 st.title('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section', 'Correlation Matrix', 'Histograms for Distribution']
+    ['Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section', 'Histograms for Distribution']
 )
 
 # Pie chart for track count
@@ -195,36 +195,6 @@ The mean track results provide a summary of the average values for both numerica
 # Visualization: Table for Categorical Columns
     st.subheader('Categorical Columns')
     st.table(mode_non_numerical_values)
-
-# Correlation Matrix of Numerical Features
-if 'Correlation Matrix' in graph_options:
-    st.title('Correlation Matrix of Numerical Features')
-    st.markdown("""
-A correlation matrix is a table showing correlation coefficients between sets of variables. Each cell in the table shows the correlation between two variables. The value is between -1 and 1.
-
-**Key Points to Consider:**
-
-**Correlation Coefficient:**
-- **+1**: Perfect positive correlation (as one variable increases, the other increases).
-- **0**: No correlation (no linear relationship between the variables).
-- **-1**: Perfect negative correlation (as one variable increases, the other decreases).
-
-**Strength of Correlation:**
-- **0.0 to 0.1**: Negligible correlation.
-- **0.1 to 0.3**: Weak correlation.
-- **0.3 to 0.5**: Moderate correlation.
-- **0.5 to 0.7**: Strong correlation.
-- **0.7 to 1.0**: Very strong correlation.
-
-**Sign of the Coefficient:**
-- **Positive (+)**: Indicates that as one variable increases, the other variable also tends to increase.
-- **Negative (-)**: Indicates that as one variable increases, the other variable tends to decrease.
-""")
-    fig4, ax4 = plt.subplots(figsize=(15, 15))  # Increase the figure size
-    corr_matrix = df[numerical_cols].corr()
-    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax4, annot_kws={"size": 8})  # Adjust font size
-    ax4.set_title('Correlation Matrix')
-    st.pyplot(fig4)
 
 # Histograms for Distribution of Numerical Features
 if 'Histograms for Distribution' in graph_options:
