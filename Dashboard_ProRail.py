@@ -448,18 +448,8 @@ if numerical_cols:
     st.subheader('Visualization Options')
     graph_options = st.multiselect(
         'Select the graphs you want to see:',
-        ['Elbow Curve', 'PCA Result', 'Pairplot']
+        ['PCA Result', 'Pairplot']
     )
-
-    if 'Elbow Curve' in graph_options:
-        plt.figure(figsize=(10, 6))
-        plt.plot(range(1, max_clusters + 1), wcss, marker='o')
-        plt.title('Elbow Method for Optimal k')
-        plt.xlabel('Number of Clusters')
-        plt.ylabel('Within-Cluster Sum of Squares (WCSS)')
-        plt.xticks(range(1, max_clusters + 1))
-        plt.grid(True)
-        st.pyplot()
 
     # Choose the number of clusters (Here fixed to 5, but you can make this dynamic)
     k = 5
@@ -529,6 +519,22 @@ for column, (include, filter_values) in column_inclusion.items():
             included_non_numerical_cols.append(column)
             filtered_df = filtered_df.join(df[df[column].isin(filter_values)][[column]], how='inner')
 
+# Save the summary table to an in-memory Excel file
+output = BytesIO()
+with pd.ExcelWriter(output, engine='openpyxl') as writer:
+    if not cluster_analysis.empty:
+        cluster_analysis.to_excel(writer, sheet_name='Cluster_Summary')
+    if not non_numerical_analysis.empty:
+        non_numerical_analysis.to_excel(writer, sheet_name='Non_Numerical_Summary')
+output.seek(0)
+
+# Provide download link for the Excel file
+st.download_button(
+    label="Download Summary of K-Means Clusters to Excel",
+    data=output,
+    file_name="K_Means_Clusters.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
 # Use the lists `included_numerical_cols` and `included_non_numerical_cols` for similarity calculations
 def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
     # Normalize numerical columns
@@ -584,24 +590,6 @@ for i in range(5):
     if st.button(f'Cluster {i} in Real tracks'):
         display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
 
-
-# Save the summary table to an in-memory Excel file
-output = BytesIO()
-with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    if not cluster_analysis.empty:
-        cluster_analysis.to_excel(writer, sheet_name='Cluster_Summary')
-    if not non_numerical_analysis.empty:
-        non_numerical_analysis.to_excel(writer, sheet_name='Non_Numerical_Summary')
-output.seek(0)
-
-
-# Provide download link for the Excel file
-st.download_button(
-    label="Download Summary of K-Means Clusters to Excel",
-    data=output,
-    file_name="K_Means_Clusters.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
 
 # Main content
 st.subheader('Map of Train Track Sections')
