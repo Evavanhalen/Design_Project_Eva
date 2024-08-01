@@ -230,6 +230,44 @@ if 'Mean Train Track Section' in graph_options:
         file_name="Mean_Track_Summary.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
+# Use the lists `included_numerical_cols` and `included_non_numerical_cols` for similarity calculations
+def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
+    # Normalize numerical columns
+    scaler = StandardScaler()
+    df_numerical = scaler.fit_transform(df[numerical_cols])
+    mean_numerical = scaler.transform([mean_vector[numerical_cols]])
+
+    # Numerical similarity based on normalized Euclidean distance
+    numerical_distances = euclidean_distances(df_numerical, mean_numerical)
+    max_numerical_distance = numerical_distances.max()
+    numerical_similarity = 1 - (numerical_distances / max_numerical_distance)
+
+    # Non-numerical similarity based on mode matching
+    non_numerical_similarity = df[non_numerical_cols].apply(lambda row: sum(row == mean_vector[non_numerical_cols]), axis=1)
+    max_non_numerical_similarity = len(non_numerical_cols)
+    non_numerical_similarity = non_numerical_similarity / max_non_numerical_similarity
+
+    # Combine both similarities with equal weighting
+    similarity_score = (numerical_similarity.flatten() + non_numerical_similarity) / 2
+    return similarity_score
+
+# Displaying similar tracks using the updated columns
+def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, section_type):
+    similarities = calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols)
+    df['Similarity'] = similarities
+    similar_tracks = df.nlargest(10, 'Similarity')  # Show top 10 similar tracks
+    st.write(f"Top 10 tracks similar to the {section_type} Mean Track Section")
+    st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_cols) + list(non_numerical_cols)])
+    df.drop(columns=['Similarity'], inplace=True)  # Clean up
+
+    # Sidebar and Main Content
+    st.subheader('Find a real-life match')
+
+    # Buttons for displaying similar tracks
+    if st.button('Mean Track Section in Real tracks'):
+        display_similar_tracks(df, mean_track_section, included_numerical_cols, included_non_numerical_cols, 'Mean')
+
 # Add a title and description
 st.header('Urban/Suburban/Regional Train Track Types Analysis')
 st.markdown("""
