@@ -341,34 +341,41 @@ if 'Numerical Means by Category' in graph_options:
             remaining_cols = numerical_cols[end_index:]
             plot_distributions(remaining_cols, filtered_df, 'Distributions of Remaining Numerical Features')
 
-# Define the function to plot non-numerical distributions
-def plot_non_numerical_distributions(columns, df, title, cols=2):
-    num_plots = len(columns)
-    rows = (num_plots // cols) + (num_plots % cols > 0)  # Calculate number of rows needed
-
-    fig, axes = plt.subplots(rows, cols, figsize=(12, 5 * rows))
-    axes = axes.flatten()
-
-    for i, col in enumerate(columns):
-        sns.countplot(x='Urban/Regional/Suburban', hue=col, data=df, ax=axes[i])
-        axes[i].set_title(f'Distribution of {col}', fontsize=10, pad=10)
-        axes[i].set_xlabel('Urban/Regional/Suburban Category', fontsize=8)
-        axes[i].tick_params(axis='x', labelsize=6, rotation=45)  # Adjust font size and rotation
-        axes[i].legend(title=col, fontsize=6, title_fontsize=8)  # Adjust legend font size
-
-    # Remove any empty subplots
-    for j in range(i + 1, len(axes)):
-        fig.delaxes(axes[j])
-
-    plt.tight_layout(pad=3.1)  # Adjust the padding between subplots
-    fig.subplots_adjust(top=0.9)  # Adjust the top spacing to make room for the main title
-    fig.suptitle(title, fontsize=16)  # Main title
-    st.pyplot(fig)
-    plt.close(fig)
-
+# Display mode of non-numerical columns by category
 if 'Display Non-Numerical Distributions' in graph_options:
-    plot_non_numerical_distributions(non_numerical_cols, filtered_df, 'Non-Numerical Feature Distributions')
+    st.subheader('Non-Numerical Feature Modes')
+    st.write("Below are the most common values (mode) for the non-numerical features across different track categories.")
+    st.table(mode_non_numerical)
 
+    # Add an expander for detailed non-numerical distributions
+    with st.expander("📊 Click here for detailed non-numerical feature distributions"):
+        # Define the function to plot non-numerical distributions
+        def plot_non_numerical_distributions(columns, df, title, cols=3):
+            num_plots = len(columns)
+            rows = (num_plots // cols) + (num_plots % cols > 0)  # Calculate number of rows needed
+
+            fig, axes = plt.subplots(rows, cols, figsize=(12, 5 * rows))
+            axes = axes.flatten()
+
+            for i, col in enumerate(columns):
+                sns.countplot(x='Urban/Regional/Suburban', hue=col, data=df, ax=axes[i])
+                axes[i].set_title(f'Distribution of {col}', fontsize=10, pad=10)
+                axes[i].set_xlabel('Urban/Regional/Suburban Category', fontsize=8)
+                axes[i].tick_params(axis='x', labelsize=6, rotation=45)  # Adjust font size and rotation
+                axes[i].legend(title=col, fontsize=6, title_fontsize=8)  # Adjust legend font size
+
+            # Remove any empty subplots
+            for j in range(i + 1, len(axes)):
+                fig.delaxes(axes[j])
+
+            plt.tight_layout(pad=3.1)  # Adjust the padding between subplots
+            fig.subplots_adjust(top=0.9)  # Adjust the top spacing to make room for the main title
+            fig.suptitle(title, fontsize=16)  # Main title
+            st.pyplot(fig)
+            plt.close(fig)
+
+        # Call the plotting function for non-numerical distributions
+        plot_non_numerical_distributions(non_numerical_cols, filtered_df, 'Non-Numerical Feature Distributions')
 # Visualization function for numerical data
 def plot_numerical_summary(summary, title):
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
