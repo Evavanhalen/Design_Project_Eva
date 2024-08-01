@@ -141,7 +141,7 @@ if 'Pie Chart (KM)' in graph_options:
 
 # Mean Train Track Section
 if 'Mean Train Track Section' in graph_options:
-    st.title('Mean Train Track Section')
+    st.subheader('Mean Train Track Section')
     with st.expander("📖 Click here for a detailed explanation of Mean Track Results"):
         st.markdown("""
     ## Mean Track Results
@@ -198,8 +198,6 @@ if 'Mean Train Track Section' in graph_options:
     with st.expander('📊 Click here for statistical distribution insights'):
         st.subheader('Histograms for Distribution of Numerical Features')
         st.markdown("""
-        ## Histograms for Distribution of Numerical Features
-
         Histograms provide a visual representation of the distribution of numerical features in the dataset. They show how the data points are spread across different values, which helps in understanding the underlying patterns and distributions of the data.
         """)
 
