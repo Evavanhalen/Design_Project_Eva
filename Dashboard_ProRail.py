@@ -194,6 +194,24 @@ if 'Mean Train Track Section' in graph_options:
         st.subheader('Categorical Columns')
         st.table(mode_non_numerical_values)
 
+        # Button to display histograms
+    if st.button('📊 Click here for statistical distribution insights'):
+        st.subheader('Histograms for Distribution of Numerical Features')
+        st.markdown("""
+        ## Histograms for Distribution of Numerical Features
+
+        Histograms provide a visual representation of the distribution of numerical features in the dataset. They show how the data points are spread across different values, which helps in understanding the underlying patterns and distributions of the data.
+        """)
+        
+        # Display histograms in a smaller size
+        numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns  
+        fig5, axes = plt.subplots(nrows=len(numerical_cols), ncols=1, figsize=(6, len(numerical_cols) * 2))
+        plt.subplots_adjust(hspace=0.5)
+        for col, ax in zip(numerical_cols, axes):
+            sns.histplot(filtered_df[col].dropna(), kde=True, ax=ax)
+            ax.set_title(f'Distribution of {col}')
+        st.pyplot(fig5)
+
     st.subheader('Download Data Summaries to Excel')
     # Save the summary table to an in-memory Excel file
     output = BytesIO()
@@ -208,48 +226,6 @@ if 'Mean Train Track Section' in graph_options:
         file_name="Mean_Track_Summary.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
-# Histograms for Distribution of Numerical Features
-if 'Histograms for Distribution' in graph_options:
-    st.title('Histograms for Distribution of Numerical Features')
-    st.markdown("""
-## Histograms for Distribution of Numerical Features
-
-Histograms provide a visual representation of the distribution of numerical features in the dataset. They show how the data points are spread across different values, which helps in understanding the underlying patterns and distributions of the data.
-
-### Key Points to Consider:
-
-**Histogram Interpretation:**
-- **Bars**: Each bar in a histogram represents the frequency of data points that fall within a specific range.
-  - The height of the bar indicates how many data points are in that range.
-- **Bins**: The range of values is divided into bins or intervals. The width of each bin affects the granularity of the histogram.
-  - More bins provide a more detailed view, while fewer bins provide a more summarized view.
-
-**Understanding Distribution Shapes:**
-- **Normal Distribution**: A symmetric, bell-shaped curve where most data points cluster around the mean.
-- **Skewed Distribution**: 
-  - **Right-Skewed (Positive Skew)**: Most data points are concentrated on the left, with a long tail on the right.
-  - **Left-Skewed (Negative Skew)**: Most data points are concentrated on the right, with a long tail on the left.
-- **Uniform Distribution**: Data points are evenly distributed across the range.
-- **Bimodal/Multimodal Distribution**: There are two or more peaks (modes) in the distribution.
-
-### Analyzing Histograms:
-- **Central Tendency**: Identifies the central value where data points tend to cluster.
-- **Spread**: Measures how spread out the data points are (variance, standard deviation).
-- **Outliers**: Identifies data points that fall far from the main distribution.
-- **Skewness and Kurtosis**: 
-  - **Skewness** indicates the asymmetry of the distribution.
-  - **Kurtosis** indicates the "tailedness" of the distribution, or how heavy/light the tails are.
-""")
-    
-    numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns  
-    fig5, axes = plt.subplots(nrows=len(numerical_cols), ncols=1, figsize=(10, len(numerical_cols) * 4))
-    plt.subplots_adjust(hspace=0.5)
-    for col, ax in zip(numerical_cols, axes):
-        sns.histplot(df[col].dropna(), kde=True, ax=ax)
-        ax.set_title(f'Distribution of {col}')
-    st.pyplot(fig5)
-
 # Add a title and description
 st.header('Urban/Suburban/Regional Train Track Types Analysis')
 st.markdown("""
