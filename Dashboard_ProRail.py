@@ -245,6 +245,18 @@ def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, 
     st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_cols) + list(non_numerical_cols)])
     df.drop(columns=['Similarity'], inplace=True)  # Clean up
 
+# Filtering and inclusion logic (this should be placed before the column layout to ensure variables are available)
+included_numerical_cols = []  # Initialize as an empty list
+included_non_numerical_cols = []  # Initialize as an empty list
+
+# Assume column_inclusion is a dictionary that has been populated earlier in the script
+for column, (include, filter_values) in column_inclusion.items():
+    if include:
+        if pd.api.types.is_numeric_dtype(df[column]):
+            included_numerical_cols.append(column)
+        else:
+            included_non_numerical_cols.append(column)
+
 # Column Layout for the interactive elements
 col1, col2 = st.columns([3, 2])
 
