@@ -74,6 +74,14 @@ for column, (include, filter_values) in column_inclusion.items():
 st.title('Train Track Section Analysis')            
 st.markdown("This is an interactive Dashboard presenting different train track sections in the Netherlands. The user is able to include and exclude certain characteristics"
             "from any statistical analysis and filter based on numerical or non-numerical values. The user can select the type of visualization they wish to see.")
+# Main content
+with st.expander("🗺️ Click here to view the Map of Train Track Sections"):
+    st.subheader('Map of Train Track Sections')
+    # Load and display the ProRail logo
+    map_path = '67.png'
+    map = Image.open(map_path)
+    st.image(map, use_column_width=True)
+
 
 st.markdown("""
     <h1 style='font-size:2.5em; color:navy;'>Filtering Section</h1>
@@ -645,12 +653,5 @@ with col2:
         cluster_mean = pd.concat([cluster_analysis.loc[i], non_numerical_analysis.loc[i]])
         if st.button(f'Cluster {i} in Real tracks'):
             display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
-
-# Main content
-st.subheader('Map of Train Track Sections')
-# Load and display the ProRail logo
-map_path = '67.png'
-map = Image.open(map_path)
-st.image(map, use_column_width=True)
 
     
