@@ -280,7 +280,7 @@ for column, (include, filter_values) in column_inclusion.items():
 col1, col2 = st.columns([2, 3])
 
 with col1:
-    st.subheader('Download Data Summaries to Excel')
+    st.subheader('Download to Excel')
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         mean_track_section.to_excel(writer, sheet_name='Mean Track Section')
@@ -514,7 +514,7 @@ for column, (include, filter_values) in column_inclusion.items():
 col1, col2 = st.columns([2, 3])
 
 with col1:
-    st.subheader('Download Data Summaries to Excel')
+    st.subheader('Download to Excel')
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         summary_numerical.to_excel(writer, sheet_name='Numerical Features')
@@ -641,7 +641,7 @@ non_numerical_analysis = filtered_df.groupby('Cluster')[non_numerical_cols_for_a
 col1, col2 = st.columns([2, 3])
 
 with col1:
-    st.subheader('Download Data Summaries to Excel')
+    st.subheader('Download to Excel')
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         if not cluster_analysis.empty:
