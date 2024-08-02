@@ -31,6 +31,15 @@ logo = Image.open(logo_path)
 # Display the logo in the sidebar
 st.sidebar.image(logo, use_column_width=True)
 
+# Apply custom CSS
+st.markdown("""
+    <style>
+    .stButton button {
+        width: 100%;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Descriptive columns that should always be included
 descriptive_columns = ['Track Section', 'Geocode', 'To', 'From']
 
