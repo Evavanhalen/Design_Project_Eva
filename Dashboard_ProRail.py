@@ -282,8 +282,10 @@ with col2:
 
 
 # Add a title and description
-st.header('Urban/Suburban/Regional Train Track Types Analysis')
-st.markdown("---")  # Divider
+st.markdown("""
+    <h1 style='font-size:2.5em; color:darkgreen;'>Urban/Suburban/Regional Train Track Types Analysis</h1>
+    <hr style='border:2px solid darkgreen;'>
+    """, unsafe_allow_html=True)
 st.markdown("""
     This dashboard allows you to analyze and visualize various features of train tracks categorized into urban, suburban, and regional types.
 
@@ -549,9 +551,10 @@ def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, 
     st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_cols) + list(non_numerical_cols)])
     df.drop(columns=['Similarity'], inplace=True)
 
-# Main Streamlit layout
-st.header('K-Clustering of Train Track Sections')
-st.markdown("---")  # Divider
+st.markdown("""
+    <h1 style='font-size:2.5em; color:darkred;'>K-Clustering of Train Track Sections</h1>
+    <hr style='border:2px solid darkred;'>
+    """, unsafe_allow_html=True)
 st.markdown("The k-means clustering algorithm is applied to the preprocessed data. K-means clustering aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster. The k-means algorithm minimizes the WCSS (Within-Cluster Sum of Square), also known as the inertia.")
 
 # Visualization Options
