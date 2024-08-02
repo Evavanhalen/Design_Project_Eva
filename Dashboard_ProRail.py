@@ -77,6 +77,7 @@ st.markdown("This is an interactive Dashboard presenting different train track s
 
 # Display the filtered dataframe with an expander
 st.header('Filtered Train Track Sections')
+st.markdown("---")  # Divider
 st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard. The table shows which track sections match the chosen criteria.")
 
 with st.expander("🔎 Click here to view the filtered track sections"):
@@ -281,6 +282,7 @@ with col2:
 
 # Add a title and description
 st.header('Urban/Suburban/Regional Train Track Types Analysis')
+st.markdown("---")  # Divider
 st.markdown("""
     This dashboard allows you to analyze and visualize various features of train tracks categorized into urban, suburban, and regional types.
 
@@ -548,6 +550,7 @@ def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, 
 
 # Main Streamlit layout
 st.header('K-Clustering of Train Track Sections')
+st.markdown("---")  # Divider
 st.markdown("The k-means clustering algorithm is applied to the preprocessed data. K-means clustering aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster. The k-means algorithm minimizes the WCSS (Within-Cluster Sum of Square), also known as the inertia.")
 
 # Visualization Options
