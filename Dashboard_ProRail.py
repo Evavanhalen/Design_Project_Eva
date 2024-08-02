@@ -75,9 +75,24 @@ st.title('Train Track Section Analysis')
 st.markdown("This is an interactive Dashboard presenting different train track sections in the Netherlands. The user is able to include and exclude certain characteristics"
             "from any statistical analysis and filter based on numerical or non-numerical values. The user can select the type of visualization they wish to see.")
 
-# Display the filtered dataframe with an expander
-st.header('Filtered Train Track Sections')
-st.markdown("---")  # Divider
+st.markdown("""
+    <style>
+    .custom-title {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #4CAF50;
+        text-align: center;
+    }
+    .custom-divider {
+        border: 2px solid #4CAF50;
+        margin-bottom: 30px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Filtering Section
+st.markdown("<div class='custom-title'>Filtering Section</div>", unsafe_allow_html=True)
+st.markdown("<hr class='custom-divider'>", unsafe_allow_html=True)  # Divider
 st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard. The table shows which track sections match the chosen criteria.")
 
 with st.expander("🔎 Click here to view the filtered track sections"):
