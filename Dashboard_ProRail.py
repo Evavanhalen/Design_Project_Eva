@@ -300,7 +300,7 @@ with col2:
 
 # Add a title and description
 st.markdown("""
-    <h1 style='font-size:2.5em; color:darkgreen;'>Urban/Suburban/Regional Train Tracks </h1>
+    <h1 style='font-size:2.4em; color:darkgreen;'>Urban/Suburban/Regional Train Tracks </h1>
     <hr style='border:2px solid darkgreen;'>
     """, unsafe_allow_html=True)
 st.markdown("""
