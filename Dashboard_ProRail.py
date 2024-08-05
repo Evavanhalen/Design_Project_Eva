@@ -329,6 +329,11 @@ mean_numerical = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].
 mode_non_numerical = filtered_df.groupby('Urban/Regional/Suburban')[non_numerical_cols].agg(lambda x: x.mode()[0])
 grouped_stds = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].std()
 
+# Handle the case where there is never a standard deviation for the regional track type
+for col in grouped_stds.columns:
+    if grouped_stds[col].isna().all():
+        grouped_stds[col] = 0
+
 # Combine numerical and non-numerical summaries
 summary_numerical = mean_numerical
 summary_non_numerical = mode_non_numerical
