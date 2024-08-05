@@ -46,9 +46,6 @@ descriptive_columns = ['Track Section', 'Geocode', 'To', 'From']
 # Sidebar for column selection using checkboxes
 st.sidebar.title('Include/Exclude Columns and Filters')
 
-# Checkbox for excluding emplacements
-exclude_emplacements = st.sidebar.checkbox('Exclude Emplacements')
-
 # Dictionary to hold the inclusion state and filter values
 column_inclusion = {}
 
@@ -83,10 +80,6 @@ for column, (include, filter_values) in column_inclusion.items():
             filtered_df = filtered_df.join(df[df[column].between(min_val, max_val)][[column]], how='inner')
         else:
             filtered_df = filtered_df.join(df[df[column].isin(filter_values)][[column]], how='inner')
-
-# Apply the exclusion of emplacements if selected
-if exclude_emplacements:
-    filtered_df = filtered_df[filtered_df['Emplacement'] == 'No']
 
 st.title('Train Track Section Analysis')            
 st.markdown("This is an interactive Dashboard presenting different train track sections in the Netherlands. The user is able to include and exclude certain characteristics"
