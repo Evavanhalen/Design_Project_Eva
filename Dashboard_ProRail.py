@@ -635,14 +635,15 @@ if numerical_cols:
         ax.legend()
         st.pyplot(fig)
         
-    # Visualize Pie Chart for Cluster Distribution
-    if 'Pie Chart' in graph_options:
-        cluster_counts = filtered_df['Cluster'].value_counts()
-        
-        plt.figure(figsize=(6, 4))
-        plt.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=140)
-        plt.title('Cluster Distribution')
-        st.pyplot()
+# Visualize Pie Chart for Cluster Distribution
+if 'Pie Chart' in graph_options:
+    cluster_counts = filtered_df['Cluster'].value_counts()
+
+    fig, ax = plt.subplots(figsize=(6, 4))  # Reduced size for the pie chart
+    ax.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=140, textprops={'fontsize': 8})
+    ax.set_title('Cluster Distribution', fontsize=10)
+    st.pyplot(fig)
+
 
 cluster_analysis = filtered_df.groupby('Cluster')[numerical_cols].mean()
 non_numerical_cols_for_analysis = non_numerical_cols.difference(descriptive_columns)
