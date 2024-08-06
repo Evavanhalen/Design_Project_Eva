@@ -587,14 +587,19 @@ graph_options = st.multiselect(
     ['Pairplot', 'Cluster Centroids']
 )
 
-numerical_cols = [col for col, (include, _) in column_inclusion.items() if include and pd.api.types.is_numeric_dtype(df[col])]
+# Selecting numerical columns excluding descriptive columns
+numerical_cols = df.select_dtypes(include=[float, int]).columns.difference(descriptive_columns)
 
-if numerical_cols:
-    numerical_data = filtered_df[numerical_cols]
+if numerical_cols.any():
+    numerical_data = df[numerical_cols]
     imputer = SimpleImputer(strategy='mean')
     imputed_data = imputer.fit_transform(numerical_data)
     scaler = StandardScaler()
     scaled_data = scaler.fit_transform(imputed_data)
+
+    # Debugging Information
+    st.write("Scaled Data Shape:", scaled_data.shape)
+    st.write("Scaled Data Preview:", pd.DataFrame(scaled_data, columns=numerical_cols).head())
 
     wcss = []
     max_clusters = 15
