@@ -91,7 +91,7 @@ with open(pdf_file_path, "rb") as f:
 
 # Create a download button
 st.download_button(
-    label="=📕Download User Guide",
+    label="📕Download User Guide",
     data=pdf_data,
     file_name="User_Guide.pdf",
     mime="application/pdf"
