@@ -614,6 +614,34 @@ if numerical_cols:
 # 3D PCA Plot and Pie Chart
 if '3D PCA' in graph_options or 'Pie Chart' in graph_options:
     col1, col2 = st.columns(2)
+with st.expander("📖 Click here for a simple explanation of the visualizations"):
+    st.markdown("""
+    ## Explanation of Visualizations
+
+    **3D PCA Plot**:
+    - This plot shows the clusters found in the data using k-means clustering.
+    - Each point represents a section of the train track.
+    - The three axes (PC1, PC2, PC3) are the first three principal components, which are new features created to summarize the data.
+    - Points that are close to each other are similar in terms of the selected features.
+    - Different colors represent different clusters.
+
+    **Pie Chart**:
+    - This chart shows the distribution of the clusters.
+    - Each slice of the pie represents one cluster.
+    - The size of each slice shows how many sections of the train track belong to that cluster.
+    """)
+
+with st.expander("📖 Click here for a simple explanation of the clustering algorithm"):
+    st.markdown("""
+    ## Explanation of the Clustering Algorithm
+
+    **K-Means Clustering**:
+    - The k-means clustering algorithm groups the data into clusters.
+    - Each data point is assigned to the nearest cluster center, called a centroid.
+    - The algorithm tries to minimize the distance between data points and their respective centroids.
+    - This way, data points within the same cluster are similar to each other.
+    - In this analysis, the algorithm has grouped the train track sections into 5 clusters.
+    """)
 
     if '3D PCA' in graph_options:
         with col1:
