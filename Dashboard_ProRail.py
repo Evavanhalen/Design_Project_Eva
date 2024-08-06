@@ -583,7 +583,7 @@ st.markdown("The k-means clustering algorithm is applied to the preprocessed dat
 st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Boxplots', 'Pie Chart']
+    ['Pie Chart']
 )
 
 # Selecting numerical columns excluding descriptive columns
@@ -614,7 +614,8 @@ if numerical_cols.any():
 
     scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
     scaled_data_df['Cluster'] = clusters
-
+    df['Cluster'] = clusters
+    
     # Visualize Pie Chart for Cluster Distribution
     if 'Pie Chart' in graph_options:
         cluster_counts = df['Cluster'].value_counts()
