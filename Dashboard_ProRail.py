@@ -583,7 +583,7 @@ st.markdown("The k-means clustering algorithm is applied to the preprocessed dat
 st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Pie Chart']
+    ['3D PCA', 'Pie Chart']
 )
 
 # Selecting numerical columns excluding descriptive columns
@@ -615,7 +615,32 @@ if numerical_cols.any():
     scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
     scaled_data_df['Cluster'] = clusters
     df['Cluster'] = clusters
+
     
+    # 3D PCA Plot
+    if '3D PCA' in graph_options:
+        pca = PCA(n_components=3)
+        pca_data = pca.fit_transform(scaled_data)
+        pca_df = pd.DataFrame(pca_data, columns=['PC1', 'PC2', 'PC3'])
+        pca_df['Cluster'] = clusters
+
+        fig = plt.figure(figsize=(10, 8))
+        ax = fig.add_subplot(111, projection='3d')
+
+        colors = sns.color_palette("hsv", len(pca_df['Cluster'].unique()))
+
+        for cluster in pca_df['Cluster'].unique():
+            cluster_data = pca_df[pca_df['Cluster'] == cluster]
+            ax.scatter(cluster_data['PC1'], cluster_data['PC2'], cluster_data['PC3'], 
+                       label=f'Cluster {cluster}', s=50, alpha=0.6, color=colors[cluster])
+
+        ax.set_title('3D PCA of Clusters')
+        ax.set_xlabel('Principal Component 1')
+        ax.set_ylabel('Principal Component 2')
+        ax.set_zlabel('Principal Component 3')
+        ax.legend()
+        st.pyplot(fig)
+        
     # Visualize Pie Chart for Cluster Distribution
     if 'Pie Chart' in graph_options:
         cluster_counts = df['Cluster'].value_counts()
