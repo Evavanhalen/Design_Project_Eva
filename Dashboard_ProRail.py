@@ -86,10 +86,8 @@ st.title('Train Track Section Analysis')
 st.markdown("This is an interactive Dashboard presenting different train track sections in the Netherlands. The user is able to include and exclude certain characteristics"
             "from any statistical analysis and filter based on numerical or non-numerical values. The user can select the type of visualization they wish to see. For more detailed information into the dashbaord, please download the user guide below.")
 
-# Read the PDF file and encode it to base64
 with open(pdf_file_path, "rb") as f:
     pdf_data = f.read()
-    b64_pdf = base64.b64encode(pdf_data).decode()
 
 # Create a download button
 st.download_button(
