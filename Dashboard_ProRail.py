@@ -614,7 +614,7 @@ if numerical_cols:
 # 3D PCA Plot and Pie Chart
 if '3D PCA' in graph_options or 'Pie Chart' in graph_options:
     col1, col2 = st.columns(2)
-    with st.expander("📖 Click here for a simple explanation of the visualizations"):
+    with st.expander("📖 Click here for an explanation of the visualizations"):
         st.markdown("""
         ## Explanation of Visualizations
 
@@ -631,7 +631,7 @@ if '3D PCA' in graph_options or 'Pie Chart' in graph_options:
         - The size of each slice shows how many sections of the train track belong to that cluster.
         """)
 
-    with st.expander("📖 Click here for a simple explanation of the clustering algorithm"):
+    with st.expander("📖 Click here for an explanation of the k-clustering algorithm"):
         st.markdown("""
         ## Explanation of the Clustering Algorithm
 
