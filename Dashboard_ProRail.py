@@ -618,7 +618,7 @@ if numerical_cols:
         pca_df = pd.DataFrame(pca_data, columns=['PC1', 'PC2', 'PC3'])
         pca_df['Cluster'] = clusters
 
-        fig = plt.figure(figsize=(8, 6))
+        fig = plt.figure(figsize=(6, 4))
         ax = fig.add_subplot(111, projection='3d')
 
         colors = sns.color_palette("hsv", len(pca_df['Cluster'].unique()))
@@ -639,8 +639,8 @@ if numerical_cols:
 if 'Pie Chart' in graph_options:
     cluster_counts = filtered_df['Cluster'].value_counts()
 
-    fig, ax = plt.subplots(figsize=(6, 4))  # Reduced size for the pie chart
-    ax.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=140, textprops={'fontsize': 8})
+    fig, ax = plt.subplots(figsize=(4, 2))  # Reduced size for the pie chart
+    ax.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=140, textprops={'fontsize': 3})
     ax.set_title('Cluster Distribution', fontsize=10)
     st.pyplot(fig)
 
