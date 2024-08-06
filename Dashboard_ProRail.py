@@ -630,7 +630,7 @@ if numerical_cols.any():
 
     # Visualize Heatmap of Cluster Centers
     if 'Heatmap' in graph_options:
-        centroids = pd.DataFrame(kmeans.cluster_centers_, columns[numerical_cols])
+        centroids = pd.DataFrame(kmeans.cluster_centers_, columns=numerical_cols)
         st.subheader('Heatmap of Cluster Centers')
         
         plt.figure(figsize=(10, 8))
