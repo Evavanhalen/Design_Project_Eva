@@ -583,7 +583,7 @@ st.markdown("The k-means clustering algorithm is applied to the preprocessed dat
 st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Pairplot', 'Heatmap', 'Boxplots', 'Pie Chart']
+    ['Boxplots', 'Pie Chart']
 )
 
 # Selecting numerical columns excluding descriptive columns
@@ -615,32 +615,7 @@ if numerical_cols.any():
     scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
     scaled_data_df['Cluster'] = clusters
 
-   # Select number of features to display in the pairplot
-    if 'Pairplot' in graph_options:
-        num_features = st.slider('Select number of features for Pairplot', min_value=2, max_value=len(numerical_cols), value=5)
-        subset_features = numerical_cols[:num_features]
-        pairplot_data = pd.concat([pd.DataFrame(scaled_data, columns=numerical_cols), pd.Series(clusters, name='Cluster')], axis=1)
-        pairplot_data = pairplot_data[['Cluster'] + list(subset_features)]
-        pairplot_data['Cluster'] = pairplot_data['Cluster'].astype(str)
-        
-        st.subheader('Pairplot of Clusters (Subset of Features)')
-        sns.pairplot(pairplot_data, hue='Cluster', palette='Set1')
-        plt.suptitle('Pairplot of Clusters (Subset of Features)', y=1.02)
-        st.pyplot()
-
-    # Visualize Heatmap of Cluster Centers
-    if 'Heatmap' in graph_options:
-        centroids = pd.DataFrame(kmeans.cluster_centers_, columns=numerical_cols)
-        st.subheader('Heatmap of Cluster Centers')
-        
-        plt.figure(figsize=(10, 8))
-        sns.heatmap(centroids, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5)
-        plt.title('Heatmap of Cluster Centers')
-        plt.xlabel('Features')
-        plt.ylabel('Clusters')
-        st.pyplot()
-
-    # Visualize Boxplots for Feature Distributions
+# Visualize Boxplots for Feature Distributions
     if 'Boxplots' in graph_options:
         st.subheader('Boxplots of Features by Cluster')
         
@@ -651,6 +626,7 @@ if numerical_cols.any():
             plt.title(f'Boxplot of {col} by Cluster')
         plt.tight_layout()
         st.pyplot()
+
 
     # Visualize Pie Chart for Cluster Distribution
     if 'Pie Chart' in graph_options:
