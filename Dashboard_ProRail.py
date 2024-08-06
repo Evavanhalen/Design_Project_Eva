@@ -89,35 +89,12 @@ st.markdown("This is an interactive Dashboard presenting different train track s
 with open(pdf_file_path, "rb") as f:
     pdf_data = f.read()
 
-# Define the button style with red color and add book emoji
-button_style = """
-    <style>
-    .download-button {
-        background-color: red;
-        color: white;
-        padding: 8px 16px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        border: none;
-        border-radius: 12px;
-    }
-    .download-button:hover {
-        background-color: #d00000;
-    }
-    </style>
-    """
-
-# Add the button style to the Streamlit app
-st.markdown(button_style, unsafe_allow_html=True)
-
-# Create a custom download button with red color and book emoji
-st.markdown(
-    f'<a href="temp_User_Guide.pdf" download="User_Guide.pdf" class="download-button">📖 Download User Guide</a>',
-    unsafe_allow_html=True
+# Create a download button
+st.download_button(
+    label="=📕Download User Guide",
+    data=pdf_data,
+    file_name="User_Guide.pdf",
+    mime="application/pdf"
 )
 
 # Main content
