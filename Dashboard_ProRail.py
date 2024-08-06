@@ -609,7 +609,7 @@ if numerical_cols:
 
     scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
     scaled_data_df['Cluster'] = clusters
-
+    filtered_df['Cluster'] = clusters
     
     # 3D PCA Plot
     if '3D PCA' in graph_options:
@@ -643,8 +643,6 @@ if numerical_cols:
         plt.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=140)
         plt.title('Cluster Distribution')
         st.pyplot()
-        
-filtered_df['Cluster'] = clusters
 
 cluster_analysis = filtered_df.groupby('Cluster')[numerical_cols].mean()
 non_numerical_cols_for_analysis = non_numerical_cols.difference(descriptive_columns)
