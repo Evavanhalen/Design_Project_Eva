@@ -637,7 +637,7 @@ if numerical_cols:
         
     # Visualize Pie Chart for Cluster Distribution
     if 'Pie Chart' in graph_options:
-        cluster_counts = filetered_df['Cluster'].value_counts()
+        cluster_counts = filtered_df['Cluster'].value_counts()
         
         plt.figure(figsize=(8, 8))
         plt.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=140)
