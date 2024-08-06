@@ -637,20 +637,21 @@ if numerical_cols:
         
     # Visualize Pie Chart for Cluster Distribution
     if 'Pie Chart' in graph_options:
-        cluster_counts = df['Cluster'].value_counts()
+        cluster_counts = filetered_df['Cluster'].value_counts()
         
         plt.figure(figsize=(8, 8))
         plt.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=140)
         plt.title('Cluster Distribution')
         st.pyplot()
         
-    # Add cluster information to the original dataframe
-    df['Cluster'] = clusters
+filtered_df['Cluster'] = clusters
 
-    # Summarize clusters
-    cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
-    non_numerical_cols = df.select_dtypes(exclude=[float, int]).columns.difference(descriptive_columns)
-    non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols].agg(lambda x: x.value_counts().index[0])
+cluster_analysis = filtered_df.groupby('Cluster')[numerical_cols].mean()
+non_numerical_cols_for_analysis = non_numerical_cols.difference(descriptive_columns)
+non_numerical_analysis = filtered_df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
+
+# Column Layout for the interactive elements
+col1, col2 = st.columns([2, 3])
 
 # Column Layout for the interactive elements
 col1, col2 = st.columns([2, 3])
