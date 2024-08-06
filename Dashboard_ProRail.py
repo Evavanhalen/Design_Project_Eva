@@ -633,10 +633,10 @@ if '3D PCA' in graph_options or 'Pie Chart' in graph_options:
                            label=f'Cluster {cluster}', s=50, alpha=0.6, color=colors[cluster])
 
             ax.set_title('3D PCA of Clusters', fontsize=10)
-            ax.set_xlabel('PC1', fontsize=8)
-            ax.set_ylabel('PC2', fontsize=8)
-            ax.set_zlabel('PC3', fontsize=8)
-            ax.legend(fontsize=8)
+            ax.set_xlabel('PC1', fontsize=6)
+            ax.set_ylabel('PC2', fontsize=6)
+            ax.set_zlabel('PC3', fontsize=6)
+            ax.legend(fontsize=6)
             st.pyplot(fig)
 
     if 'Pie Chart' in graph_options:
@@ -644,7 +644,7 @@ if '3D PCA' in graph_options or 'Pie Chart' in graph_options:
             cluster_counts = filtered_df['Cluster'].value_counts()
 
             fig, ax = plt.subplots(figsize=(4, 4), dpi=200)  # Reduced size and high DPI for better quality
-            ax.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=90, textprops={'fontsize': 8})
+            ax.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=90, textprops={'fontsize': 6})
             ax.set_title('Cluster Distribution', fontsize=10)
             st.pyplot(fig)
 
