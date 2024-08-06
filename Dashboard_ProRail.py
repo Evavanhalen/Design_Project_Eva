@@ -21,6 +21,7 @@ warnings.filterwarnings("ignore", category=FutureWarning, module='seaborn._oldco
 # Define file paths using relative paths
 file_path = 'Template_V03 (6).xlsx'
 logo_path = 'ProRail logo.png'
+pdf_file_path = 'User_Guide.pdf'
 
 # Load the data from the template
 df = pd.read_excel(file_path, sheet_name='Template')
@@ -83,7 +84,21 @@ for column, (include, filter_values) in column_inclusion.items():
 
 st.title('Train Track Section Analysis')            
 st.markdown("This is an interactive Dashboard presenting different train track sections in the Netherlands. The user is able to include and exclude certain characteristics"
-            "from any statistical analysis and filter based on numerical or non-numerical values. The user can select the type of visualization they wish to see.")
+            "from any statistical analysis and filter based on numerical or non-numerical values. The user can select the type of visualization they wish to see. For more detailed information into the dashbaord, please download the user guide below.")
+
+# Read the PDF file and encode it to base64
+with open(pdf_file_path, "rb") as f:
+    pdf_data = f.read()
+    b64_pdf = base64.b64encode(pdf_data).decode()
+
+# Create a download button
+st.download_button(
+    label="Download User Guide",
+    data=pdf_data,
+    file_name="User_Guide.pdf",
+    mime="application/pdf"
+)
+
 # Main content
 with st.expander("🗺️ Click here to view the Map of Train Track Sections"):
     st.subheader('Map of Train Track Sections')
