@@ -618,7 +618,7 @@ if '3D PCA' in graph_options:
     pca_df = pd.DataFrame(pca_data, columns=['PC1', 'PC2', 'PC3'])
     pca_df['Cluster'] = clusters
 
-    fig = plt.figure(figsize=(6, 4), dpi=200)  # Reduced size and high DPI for better quality
+    fig = plt.figure(figsize=(12, 5))  # Same size as numerical features plot
     ax = fig.add_subplot(111, projection='3d')
 
     colors = sns.color_palette("hsv", len(pca_df['Cluster'].unique()))
@@ -628,20 +628,20 @@ if '3D PCA' in graph_options:
         ax.scatter(cluster_data['PC1'], cluster_data['PC2'], cluster_data['PC3'], 
                    label=f'Cluster {cluster}', s=50, alpha=0.6, color=colors[cluster])
 
-    ax.set_title('3D PCA of Clusters', fontsize=10)
-    ax.set_xlabel('Principal Component 1', fontsize=8)
-    ax.set_ylabel('Principal Component 2', fontsize=8)
-    ax.set_zlabel('Principal Component 3', fontsize=8)
-    ax.legend(fontsize=6)
+    ax.set_title('3D PCA of Clusters', fontsize=16)
+    ax.set_xlabel('Principal Component 1', fontsize=10)
+    ax.set_ylabel('Principal Component 2', fontsize=10)
+    ax.set_zlabel('Principal Component 3', fontsize=10)
+    ax.legend(fontsize=10)
     st.pyplot(fig)
 
 # Visualize Pie Chart for Cluster Distribution
 if 'Pie Chart' in graph_options:
     cluster_counts = filtered_df['Cluster'].value_counts()
 
-    fig, ax = plt.subplots(figsize=(4, 3), dpi=200)  # Reduced size and high DPI for better quality
-    ax.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=140, textprops={'fontsize': 5})
-    ax.set_title('Cluster Distribution', fontsize=8)
+    fig, ax = plt.subplots(figsize=(4, 4))  # Same size as the KM pie chart
+    ax.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=90, textprops={'fontsize': 10})
+    ax.set_title('Cluster Distribution', fontsize=12)
     st.pyplot(fig)
 
 
