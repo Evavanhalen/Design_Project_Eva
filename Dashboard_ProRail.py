@@ -614,22 +614,34 @@ if numerical_cols.any():
 
     scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
     scaled_data_df['Cluster'] = clusters
+        # Ensure 'Cluster' column is added to the original DataFrame
+    df['Cluster'] = clusters
 
+        # Debugging Information
+    st.write("Scaled DataFrame Columns:", scaled_data_df.columns)
+    st.write("Scaled DataFrame Types:", scaled_data_df.dtypes)
+    st.write("Scaled DataFrame Head:", scaled_data_df.head())
+    st.write("Original DataFrame Columns after adding 'Cluster':", df.columns)
+    st.write("Original DataFrame Types after adding 'Cluster':", df.dtypes)
+    
     # Visualize Boxplots for Feature Distributions
     if 'Boxplots' in graph_options:
         st.subheader('Boxplots of Features by Cluster')
         
-        plt.figure(figsize=(15, 10))
-        for i, col in enumerate(numerical_cols[:5], 1):  # Adjust number of features as needed
-            # More detailed debugging information for each column
-            st.write(f"Plotting Boxplot for column: {col}")
-            st.write(f"Data type of {col}: {df[col].dtype}")
-            st.write(f"Data type of 'Cluster': {df['Cluster'].dtype}")
-            st.write(f"Unique values in 'Cluster': {df['Cluster'].unique()}")
-            sns.boxplot(x='Cluster', y=col, data=df)
-            plt.title(f'Boxplot of {col} by Cluster')
-        plt.tight_layout()
-        st.pyplot()
+        if 'Cluster' in df.columns:
+            plt.figure(figsize=(15, 10))
+            for i, col in enumerate(numerical_cols[:5], 1):  # Adjust number of features as needed
+                # More detailed debugging information for each column
+                st.write(f"Plotting Boxplot for column: {col}")
+                st.write(f"Data type of {col}: {df[col].dtype}")
+                st.write(f"Data type of 'Cluster': {df['Cluster'].dtype}")
+                st.write(f"Unique values in 'Cluster': {df['Cluster'].unique()}")
+                sns.boxplot(x='Cluster', y=col, data=df)
+                plt.title(f'Boxplot of {col} by Cluster')
+            plt.tight_layout()
+            st.pyplot()
+        else:
+            st.error("'Cluster' column is missing in the DataFrame!")
 
     # Visualize Pie Chart for Cluster Distribution
     if 'Pie Chart' in graph_options:
