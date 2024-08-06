@@ -116,7 +116,7 @@ st.markdown(button_style, unsafe_allow_html=True)
 
 # Create a custom download button with red color and book emoji
 st.markdown(
-    f'<a href="data:application/octet-stream;base64,{b64_pdf}" download="User_Guide.pdf" class="download-button">📖 Download User Guide</a>',
+    f'<a href="temp_User_Guide.pdf" download="User_Guide.pdf" class="download-button">📖 Download User Guide</a>',
     unsafe_allow_html=True
 )
 
