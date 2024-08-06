@@ -580,11 +580,10 @@ st.markdown("""
     """, unsafe_allow_html=True)
 st.markdown("The k-means clustering algorithm is applied to the preprocessed data. K-means clustering aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster. The k-means algorithm minimizes the WCSS (Within-Cluster Sum of Square), also known as the inertia.")
 
-# Visualization Options
 st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Pairplot', 'Cluster Centroids']
+    ['Pairplot', 'Heatmap', 'Boxplots', 'Pie Chart']
 )
 
 # Selecting numerical columns excluding descriptive columns
@@ -616,14 +615,10 @@ if numerical_cols.any():
     scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
     scaled_data_df['Cluster'] = clusters
 
-    pca = PCA(n_components=2)
-    pca_data = pca.fit_transform(scaled_data)
-    pca_df = pd.DataFrame(pca_data, columns=['PC1', 'PC2'])
-    pca_df['Cluster'] = clusters
-
-    # Visualize Pairplot
+   # Select number of features to display in the pairplot
     if 'Pairplot' in graph_options:
-        subset_features = numerical_cols[:5]
+        num_features = st.slider('Select number of features for Pairplot', min_value=2, max_value=len(numerical_cols), value=5)
+        subset_features = numerical_cols[:num_features]
         pairplot_data = pd.concat([pd.DataFrame(scaled_data, columns=numerical_cols), pd.Series(clusters, name='Cluster')], axis=1)
         pairplot_data = pairplot_data[['Cluster'] + list(subset_features)]
         pairplot_data['Cluster'] = pairplot_data['Cluster'].astype(str)
@@ -633,20 +628,39 @@ if numerical_cols.any():
         plt.suptitle('Pairplot of Clusters (Subset of Features)', y=1.02)
         st.pyplot()
 
-    # Visualize Cluster Centroids
-    if 'Cluster Centroids' in graph_options:
-        centroids = pd.DataFrame(kmeans.cluster_centers_, columns=numerical_cols)
-        st.subheader('Cluster Centroids')
+    # Visualize Heatmap of Cluster Centers
+    if 'Heatmap' in graph_options:
+        centroids = pd.DataFrame(kmeans.cluster_centers_, columns[numerical_cols)
+        st.subheader('Heatmap of Cluster Centers')
         
-        plt.figure(figsize=(15, 8))
-        centroids.plot(kind='bar', figsize=(15, 8))
-        plt.title('Cluster Centroids')
-        plt.xlabel('Cluster')
-        plt.ylabel('Standardized Feature Value')
-        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(centroids, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5)
+        plt.title('Heatmap of Cluster Centers')
+        plt.xlabel('Features')
+        plt.ylabel('Clusters')
+        st.pyplot()
+
+    # Visualize Boxplots for Feature Distributions
+    if 'Boxplots' in graph_options:
+        st.subheader('Boxplots of Features by Cluster')
+        
+        plt.figure(figsize=(15, 10))
+        for i, col in enumerate(numerical_cols[:5], 1):  # Adjust number of features as needed
+            plt.subplot(2, 3, i)
+            sns.boxplot(x='Cluster', y=col, data=df)
+            plt.title(f'Boxplot of {col} by Cluster')
         plt.tight_layout()
         st.pyplot()
 
+    # Visualize Pie Chart for Cluster Distribution
+    if 'Pie Chart' in graph_options:
+        cluster_counts = df['Cluster'].value_counts()
+        
+        plt.figure(figsize=(8, 8))
+        plt.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=140)
+        plt.title('Cluster Distribution')
+        st.pyplot()
+        
     # Add cluster information to the original dataframe
     df['Cluster'] = clusters
 
