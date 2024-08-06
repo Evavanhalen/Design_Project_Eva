@@ -584,7 +584,7 @@ st.markdown("The k-means clustering algorithm is applied to the preprocessed dat
 st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['PCA Result', 'Pairplot']
+    ['Pairplot', 'Cluster Centroids']
 )
 
 numerical_cols = [col for col, (include, _) in column_inclusion.items() if include and pd.api.types.is_numeric_dtype(df[col])]
@@ -616,32 +616,39 @@ if numerical_cols:
     pca_df = pd.DataFrame(pca_data, columns=['PC1', 'PC2'])
     pca_df['Cluster'] = clusters
 
-    if 'PCA Result' in graph_options:
-        plt.figure(figsize=(10, 6))
-        for cluster in range(k):
-            plt.scatter(pca_df[pca_df['Cluster'] == cluster]['PC1'], pca_df[pca_df['Cluster'] == cluster]['PC2'], label=f'Cluster {cluster}')
-        plt.title('PCA of Clusters')
-        plt.xlabel('Principal Component 1')
-        plt.ylabel('Principal Component 2')
-        plt.legend()
-        plt.grid(True)
-        st.pyplot()
-
-    subset_features = numerical_cols[:5]
-    pairplot_data = pd.concat([pd.DataFrame(scaled_data, columns=numerical_cols), pd.Series(clusters, name='Cluster')], axis=1)
-    pairplot_data = pairplot_data[['Cluster'] + list(subset_features)]
-    pairplot_data['Cluster'] = pairplot_data['Cluster'].astype(str)
-
+    # Visualize Pairplot
     if 'Pairplot' in graph_options:
+        subset_features = numerical_cols[:5]
+        pairplot_data = pd.concat([pd.DataFrame(scaled_data, columns=numerical_cols), pd.Series(clusters, name='Cluster')], axis=1)
+        pairplot_data = pairplot_data[['Cluster'] + list(subset_features)]
+        pairplot_data['Cluster'] = pairplot_data['Cluster'].astype(str)
+        
+        st.subheader('Pairplot of Clusters (Subset of Features)')
         sns.pairplot(pairplot_data, hue='Cluster', palette='Set1')
         plt.suptitle('Pairplot of Clusters (Subset of Features)', y=1.02)
         st.pyplot()
 
-filtered_df['Cluster'] = clusters
+    # Visualize Cluster Centroids
+    if 'Cluster Centroids' in graph_options:
+        centroids = pd.DataFrame(kmeans.cluster_centers_, columns=numerical_cols)
+        st.subheader('Cluster Centroids')
+        
+        plt.figure(figsize=(15, 8))
+        centroids.plot(kind='bar', figsize=(15, 8))
+        plt.title('Cluster Centroids')
+        plt.xlabel('Cluster')
+        plt.ylabel('Standardized Feature Value')
+        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.tight_layout()
+        st.pyplot()
 
-cluster_analysis = filtered_df.groupby('Cluster')[numerical_cols].mean()
-non_numerical_cols_for_analysis = non_numerical_cols.difference(descriptive_columns)
-non_numerical_analysis = filtered_df.groupby('Cluster')[non_numerical_cols_for_analysis].agg(lambda x: x.value_counts().index[0])
+    # Add cluster information to the original dataframe
+    df['Cluster'] = clusters
+
+    # Summarize clusters
+    cluster_analysis = df.groupby('Cluster')[numerical_cols].mean()
+    non_numerical_cols = df.select_dtypes(exclude=[float, int]).columns.difference(descriptive_columns)
+    non_numerical_analysis = df.groupby('Cluster')[non_numerical_cols].agg(lambda x: x.value_counts().index[0])
 
 # Column Layout for the interactive elements
 col1, col2 = st.columns([2, 3])
