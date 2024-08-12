@@ -137,16 +137,12 @@ graph_options = st.multiselect(
     ['Pie Chart (Count)', 'Pie Chart (KM/Length)', 'Mean Train Track Section']
 )
 
-# Add the label with the custom class
-st.markdown('<p class="custom-label">Select the measurement for the second pie chart:</p>', unsafe_allow_html=True)
-
-# Toggle between Track Length and Track KM for Pie Chart with unique key
+# Toggle between Track Length and Track KM for Pie Chart
 track_measurement = st.radio(
-    "",
+    "Select the measurement for the second pie chart:",
     ('Track Kilometers', 'Track Length'),
-    key="track_measurement_toggle"
+    key="track_measurement_toggle"  # Add a unique key here
 )
-
 
 
 # Calculate the mean train track section
