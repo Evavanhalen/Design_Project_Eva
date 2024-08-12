@@ -163,13 +163,14 @@ if 'Pie Chart (Count)' in graph_options:
         st.write(f"Tracks matching criteria: {filtered_tracks_count}")
         st.write(f"Percentage matching criteria: {percentage_matching_tracks:.2f}%")
 
+# Toggle between Track Length and Track KM for Pie Chart
+track_measurement = st.radio(
+    "Select the measurement for the second pie chart:",
+    ('Track Kilometers', 'Track Length')
+)
+
 # Conditional display for Pie chart (KM/Length)
 if 'Pie Chart (KM/Length)' in graph_options:
-    # Toggle between Track Length and Track KM for Pie Chart
-    track_measurement = st.radio(
-        "Select the measurement for the second pie chart:",
-        ('Track Kilometers', 'Track Length')
-    )
     with col2:
         if track_measurement == 'Track Kilometers':
             st.subheader('Distribution of Matching Tracks (KM)')
