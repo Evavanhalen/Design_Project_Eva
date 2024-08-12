@@ -45,11 +45,11 @@ st.markdown("""
     <style>
     /* Increase the font size of the radio button label 
     .custom-label {
-        font-size: 20px; 
+        font-size: 60px; 
         color: black; 
     }
     .stRadio > div > label {
-        font-size: 28px; 
+        font-size: 68px; 
     }
     </style>
     """, unsafe_allow_html=True)
