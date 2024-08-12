@@ -155,11 +155,13 @@ graph_options = st.multiselect(
     ['Pie Chart (Count)', 'Pie Chart (KM/Length)', 'Mean Train Track Section']
 )
 
-# Toggle between Track Length and Track KM for Pie Chart
+# Choose km of track or track length
 track_measurement = st.radio(
     "Select the measurement for the second pie chart:",
-    ('Track Kilometers', 'Track Length')
+    ('Track Kilometers', 'Track Length'),
+    key="track_measurement_toggle"  
 )
+
 
 
 # Calculate the mean train track section
