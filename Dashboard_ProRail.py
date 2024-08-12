@@ -624,6 +624,18 @@ if numerical_cols:
     scaled_data_df['Cluster'] = clusters
     filtered_df['Cluster'] = clusters
     
+# Ensure there are no NaN or infinite values in the data
+if np.isnan(scaled_data).any() or np.isinf(scaled_data).any():
+    raise ValueError("scaled_data contains NaN or infinite values.")
+
+# Ensure the number of clusters is less than or equal to the number of samples
+if scaled_data.shape[0] < k:
+    raise ValueError(f"Number of clusters ({k}) cannot be greater than the number of samples ({scaled_data.shape[0]}).")
+
+# Fit the KMeans model
+kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+kmeans.fit(scaled_data)
+    
 # 3D PCA Plot and Pie Chart
 if '3D PCA' in graph_options or 'Pie Chart' in graph_options:
     col1, col2 = st.columns(2)
