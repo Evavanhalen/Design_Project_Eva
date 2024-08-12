@@ -41,22 +41,18 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Apply custom CSS for the radio button (toggle) font size
 st.markdown("""
     <style>
-    /* Increase the font size of radio button labels */
-    .stRadio > div > label {
-        font-size: 24px; 
+    /* Increase the font size of the radio button label 
+    .custom-label {
+        font-size: 30px; 
         color: black; 
+    }
+    .stRadio > div > label {
+        font-size: 28px; 
     }
     </style>
     """, unsafe_allow_html=True)
-
-# Toggle between Track Length and Track KM for Pie Chart
-track_measurement = st.radio(
-    "Select the measurement for the second pie chart:",
-    ('Track Kilometers', 'Track Length')
-)
 
 
 # Descriptive columns that should always be included
@@ -155,11 +151,14 @@ graph_options = st.multiselect(
     ['Pie Chart (Count)', 'Pie Chart (KM/Length)', 'Mean Train Track Section']
 )
 
-# Choose km of track or track length
+# Add the label with the custom class
+st.markdown('<p class="custom-label">Select the measurement for the second pie chart:</p>', unsafe_allow_html=True)
+
+# Toggle between Track Length and Track KM for Pie Chart with unique key
 track_measurement = st.radio(
-    "Select the measurement for the second pie chart:",
+    "",
     ('Track Kilometers', 'Track Length'),
-    key="track_measurement_toggle"  
+    key="track_measurement_toggle"
 )
 
 
