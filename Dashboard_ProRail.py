@@ -41,20 +41,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-    <style>
-    /* Increase the font size of the radio button label 
-    .custom-label {
-        font-size: 60px; 
-        color: black; 
-    }
-    .stRadio > div > label {
-        font-size: 68px; 
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-
 # Descriptive columns that should always be included
 descriptive_columns = ['Track Section', 'Geocode', 'To', 'From']
 
