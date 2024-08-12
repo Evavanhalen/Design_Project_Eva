@@ -41,6 +41,24 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Apply custom CSS for the radio button (toggle) font size
+st.markdown("""
+    <style>
+    /* Increase the font size of radio button labels */
+    .stRadio > div > label {
+        font-size: 20px; 
+        color: black; 
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Toggle between Track Length and Track KM for Pie Chart
+track_measurement = st.radio(
+    "Select the measurement for the second pie chart:",
+    ('Track Kilometers', 'Track Length')
+)
+
+
 # Descriptive columns that should always be included
 descriptive_columns = ['Track Section', 'Geocode', 'To', 'From']
 
@@ -137,6 +155,13 @@ graph_options = st.multiselect(
     ['Pie Chart (Count)', 'Pie Chart (KM/Length)', 'Mean Train Track Section']
 )
 
+# Toggle between Track Length and Track KM for Pie Chart
+track_measurement = st.radio(
+    "Select the measurement for the second pie chart:",
+    ('Track Kilometers', 'Track Length')
+)
+
+
 # Calculate the mean train track section
 numerical_cols = df.select_dtypes(include=[float, int]).columns.difference(descriptive_columns)
 non_numerical_cols = df.select_dtypes(exclude=[float, int]).columns.difference(descriptive_columns)
@@ -162,12 +187,6 @@ if 'Pie Chart (Count)' in graph_options:
         st.write(f"Total tracks: {total_tracks_count}")
         st.write(f"Tracks matching criteria: {filtered_tracks_count}")
         st.write(f"Percentage matching criteria: {percentage_matching_tracks:.2f}%")
-
-# Toggle between Track Length and Track KM for Pie Chart
-track_measurement = st.radio(
-    "Select the measurement for the second pie chart:",
-    ('Track Kilometers', 'Track Length')
-)
 
 # Conditional display for Pie chart (KM/Length)
 if 'Pie Chart (KM/Length)' in graph_options:
