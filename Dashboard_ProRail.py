@@ -137,12 +137,6 @@ graph_options = st.multiselect(
     ['Pie Chart (Count)', 'Pie Chart (KM/Length)', 'Mean Train Track Section']
 )
 
-# Toggle between Track Length and Track KM for Pie Chart
-track_measurement = st.radio(
-    "Select the measurement for the second pie chart:",
-    ('Track Kilometers', 'Track Length')
-)
-
 # Calculate the mean train track section
 numerical_cols = df.select_dtypes(include=[float, int]).columns.difference(descriptive_columns)
 non_numerical_cols = df.select_dtypes(exclude=[float, int]).columns.difference(descriptive_columns)
@@ -171,6 +165,11 @@ if 'Pie Chart (Count)' in graph_options:
 
 # Conditional display for Pie chart (KM/Length)
 if 'Pie Chart (KM/Length)' in graph_options:
+    # Toggle between Track Length and Track KM for Pie Chart
+    track_measurement = st.radio(
+        "Select the measurement for the second pie chart:",
+        ('Track Kilometers', 'Track Length')
+    )
     with col2:
         if track_measurement == 'Track Kilometers':
             st.subheader('Distribution of Matching Tracks (KM)')
