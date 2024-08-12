@@ -125,11 +125,22 @@ total_km_tracks = df['km track'].sum()
 filtered_km_tracks = filtered_df['km track'].sum()
 percentage_matching_km_tracks = (filtered_km_tracks / total_km_tracks) * 100
 
+# Assuming track_length is a column in your DataFrame
+total_track_length = df['track_length'].sum()
+filtered_track_length = filtered_df['track_length'].sum()
+percentage_matching_track_length = (filtered_track_length / total_track_length) * 100
+
 # Visualization Options
 st.subheader('Visualization Options')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Pie Chart (Count)', 'Pie Chart (KM)', 'Mean Train Track Section']
+    ['Pie Chart (Count)', 'Pie Chart (KM/Length)', 'Mean Train Track Section']
+)
+
+# Toggle between Track Length and Track KM for Pie Chart
+track_measurement = st.radio(
+    "Select the measurement for the second pie chart:",
+    ('Track Kilometers', 'Track Length')
 )
 
 # Calculate the mean train track section
@@ -158,19 +169,32 @@ if 'Pie Chart (Count)' in graph_options:
         st.write(f"Tracks matching criteria: {filtered_tracks_count}")
         st.write(f"Percentage matching criteria: {percentage_matching_tracks:.2f}%")
 
-# Conditional display for Pie chart (KM)
-if 'Pie Chart (KM)' in graph_options:
+# Conditional display for Pie chart (KM/Length)
+if 'Pie Chart (KM/Length)' in graph_options:
     with col2:
-        st.subheader('Distribution of Matching Tracks (KM)')
-        st.markdown("The pie chart shows the kilometer of track that match the user-specified criteria")
-        fig2, ax2 = plt.subplots(figsize=(4, 4))  # Adjust the size as needed
-        ax2.pie([filtered_km_tracks, total_km_tracks - filtered_km_tracks],
-                labels=['Matching', 'Not Matching'], autopct='%1.1f%%', startangle=90)
-        ax2.axis('equal')
-        st.pyplot(fig2)
-        st.write(f"Total km of tracks: {total_km_tracks:.2f} km")
-        st.write(f"Km of tracks matching criteria: {filtered_km_tracks:.2f} km")
-        st.write(f"Percentage of km tracks matching criteria: {percentage_matching_km_tracks:.2f}%")
+        if track_measurement == 'Track Kilometers':
+            st.subheader('Distribution of Matching Tracks (KM)')
+            st.markdown("The pie chart shows the kilometer of track that match the user-specified criteria")
+            fig2, ax2 = plt.subplots(figsize=(4, 4))  # Adjust the size as needed
+            ax2.pie([filtered_km_tracks, total_km_tracks - filtered_km_tracks],
+                    labels=['Matching', 'Not Matching'], autopct='%1.1f%%', startangle=90)
+            ax2.axis('equal')
+            st.pyplot(fig2)
+            st.write(f"Total km of tracks: {total_km_tracks:.2f} km")
+            st.write(f"Km of tracks matching criteria: {filtered_km_tracks:.2f} km")
+            st.write(f"Percentage of km tracks matching criteria: {percentage_matching_km_tracks:.2f}%")
+        else:
+            st.subheader('Distribution of Matching Tracks (Track Length)')
+            st.markdown("The pie chart shows the total track length that matches the user-specified criteria")
+            fig2, ax2 = plt.subplots(figsize=(4, 4))  # Adjust the size as needed
+            ax2.pie([filtered_track_length, total_track_length - filtered_track_length],
+                    labels=['Matching', 'Not Matching'], autopct='%1.1f%%', startangle=90)
+            ax2.axis('equal')
+            st.pyplot(fig2)
+            st.write(f"Total track length: {total_track_length:.2f} units")
+            st.write(f"Track length matching criteria: {filtered_track_length:.2f} units")
+            st.write(f"Percentage matching track length: {percentage_matching_track_length:.2f}%")
+
 
 # Mean Train Track Section
 if 'Mean Train Track Section' in graph_options:
