@@ -627,27 +627,30 @@ graph_options = st.multiselect(
 
 numerical_cols = [col for col, (include, _) in column_inclusion.items() if include and pd.api.types.is_numeric_dtype(df[col])]
 
-if numerical_cols:
+# After applying filters, check the number of samples
+if filtered_df.shape[0] == 0:
+    st.warning("No data available after applying filters. Please adjust the filters.")
+elif filtered_df.shape[0] < k:  # Assuming k is the number of clusters
+    st.warning(f"Not enough data for clustering. Only {filtered_df.shape[0]} samples available. Please adjust the filters or reduce the number of clusters.")
+    # Optionally, you can adjust the number of clusters automatically:
+    k = max(1, filtered_df.shape[0])
+else:
+    # Proceed with KMeans clustering or other operations
     numerical_data = filtered_df[numerical_cols]
-    imputer = SimpleImputer(strategy='mean')
-    imputed_data = imputer.fit_transform(numerical_data)
-    scaler = StandardScaler()
-    scaled_data = scaler.fit_transform(imputed_data)
-
-    max_clusters = 10
     
-    if len(scaled_data) < max_clusters:
-        max_clusters = len(scaled_data)  # Adjust max_clusters to the number of available samples
+    # Ensure there's no NaN or infinite values before scaling
+    if np.isnan(numerical_data).any() or np.isinf(numerical_data).any():
+        st.error("Filtered data contains NaN or infinite values. Please check the data or adjust the filters.")
+    else:
+        # Impute missing values and scale the data
+        imputer = SimpleImputer(strategy='mean')
+        imputed_data = imputer.fit_transform(numerical_data)
+        scaler = StandardScaler()
+        scaled_data = scaler.fit_transform(imputed_data)
 
-    wcss = []
-    for i in range(1, max_clusters + 1):
-        kmeans = KMeans(n_clusters=i, random_state=42, n_init=10)
-        kmeans.fit(scaled_data)
-        wcss.append(kmeans.inertia_)
-
-    k = 5
-    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-    clusters = kmeans.fit_predict(scaled_data)
+        # Perform KMeans clustering
+        kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+        clusters = kmeans.fit_predict(scaled_data)
 
     scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
     scaled_data_df['Cluster'] = clusters
