@@ -775,8 +775,8 @@ with col2:
     for i in cluster_analysis.index:
         if i in non_numerical_analysis.index:
             cluster_mean = pd.concat([cluster_analysis.loc[i], non_numerical_analysis.loc[i]])
-                if st.button(f'Cluster {i} in Real tracks'):
-                    display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
+            if st.button(f'Cluster {i} in Real tracks'):
+                display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
     else:
         st.warning(f"Cluster {i} not found in non_numerical_analysis.")
 
