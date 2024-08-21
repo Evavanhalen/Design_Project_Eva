@@ -625,52 +625,39 @@ graph_options = st.multiselect(
     ['3D PCA', 'Pie Chart']
 )
 
-numerical_cols = [col for col, (include, _) in column_inclusion.items() if include and pd.api.types.is_numeric_dtype(df[col])]
+# Convert numerical_data to a NumPy array for the checks
+numerical_data_array = numerical_data.to_numpy()
 
-# After applying filters, check the number of samples
-if filtered_df.shape[0] == 0:
-    st.warning("No data available after applying filters. Please adjust the filters.")
+# Ensure there's no NaN or infinite values before scaling
+if np.isnan(numerical_data_array).any() or np.isinf(numerical_data_array).any():
+    st.error("Filtered data contains NaN or infinite values. Please check the data or adjust the filters.")
 else:
-    # Define the number of clusters, k
-    default_k = 5  # Default number of clusters
-    k = min(default_k, filtered_df.shape[0])  # Set k to the default or the number of samples, whichever is smaller
+    # Impute missing values and scale the data
+    imputer = SimpleImputer(strategy='mean')
+    imputed_data = imputer.fit_transform(numerical_data_array)
+    scaler = StandardScaler()
+    scaled_data = scaler.fit_transform(imputed_data)
+
+    # Perform KMeans clustering
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    clusters = kmeans.fit_predict(scaled_data)
+
+    scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
+    scaled_data_df['Cluster'] = clusters
+    filtered_df['Cluster'] = clusters
     
-    if filtered_df.shape[0] < k:
-        st.warning(f"Not enough data for {k} clusters. Only {filtered_df.shape[0]} samples available. Adjusting number of clusters to {filtered_df.shape[0]}.")
-        k = filtered_df.shape[0]
-    
-    # Proceed with KMeans clustering or other operations
-    numerical_data = filtered_df[numerical_cols]
-    
-    # Ensure there's no NaN or infinite values before scaling
-    if np.isnan(numerical_data).any() or np.isinf(numerical_data).any():
-        st.error("Filtered data contains NaN or infinite values. Please check the data or adjust the filters.")
-    else:
-        # Impute missing values and scale the data
-        imputer = SimpleImputer(strategy='mean')
-        imputed_data = imputer.fit_transform(numerical_data)
-        scaler = StandardScaler()
-        scaled_data = scaler.fit_transform(imputed_data)
+    # Ensure there are no NaN or infinite values in the scaled data
+    if np.isnan(scaled_data).any() or np.isinf(scaled_data).any():
+        raise ValueError("scaled_data contains NaN or infinite values.")
 
-        # Perform KMeans clustering
-        kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-        clusters = kmeans.fit_predict(scaled_data)
+    # Ensure the number of clusters is less than or equal to the number of samples
+    if scaled_data.shape[0] < k:
+        raise ValueError(f"Number of clusters ({k}) cannot be greater than the number of samples ({scaled_data.shape[0]}).")
 
-        scaled_data_df = pd.DataFrame(scaled_data, columns=numerical_cols)
-        scaled_data_df['Cluster'] = clusters
-        filtered_df['Cluster'] = clusters
-        
-        # Ensure there are no NaN or infinite values in the data
-        if np.isnan(scaled_data).any() or np.isinf(scaled_data).any():
-            raise ValueError("scaled_data contains NaN or infinite values.")
+    # Fit the KMeans model
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    kmeans.fit(scaled_data)
 
-        # Ensure the number of clusters is less than or equal to the number of samples
-        if scaled_data.shape[0] < k:
-            raise ValueError(f"Number of clusters ({k}) cannot be greater than the number of samples ({scaled_data.shape[0]}).")
-
-        # Fit the KMeans model
-        kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-        kmeans.fit(scaled_data)
     
 # 3D PCA Plot and Pie Chart
 if '3D PCA' in graph_options or 'Pie Chart' in graph_options:
