@@ -634,6 +634,8 @@ if numerical_cols:
     scaler = StandardScaler()
     scaled_data = scaler.fit_transform(imputed_data)
 
+    max_clusters = 10
+    
     if len(scaled_data) < max_clusters:
         max_clusters = len(scaled_data)  # Adjust max_clusters to the number of available samples
 
