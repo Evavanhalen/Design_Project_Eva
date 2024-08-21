@@ -778,6 +778,6 @@ with col2:
             if st.button(f'Cluster {i} in Real tracks'):
                 display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
     else:
-        st.warning(f"Cluster {i+1} not found in non_numerical_analysis.")
+        st.warning(f"Cluster {i+1} not found due to filtering in left menu. Remove some filters to obtain up to 5 clusters.")
 
     
