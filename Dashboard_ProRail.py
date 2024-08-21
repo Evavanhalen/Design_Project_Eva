@@ -634,9 +634,10 @@ if numerical_cols:
     scaler = StandardScaler()
     scaled_data = scaler.fit_transform(imputed_data)
 
-    wcss = []
-    max_clusters = 15
+    if len(scaled_data) < max_clusters:
+        max_clusters = len(scaled_data)  # Adjust max_clusters to the number of available samples
 
+    wcss = []
     for i in range(1, max_clusters + 1):
         kmeans = KMeans(n_clusters=i, random_state=42, n_init=10)
         kmeans.fit(scaled_data)
