@@ -21,7 +21,7 @@ warnings.filterwarnings("ignore", category=FutureWarning, module='seaborn._oldco
 # Define file paths using relative paths
 file_path = 'Template_V03 (6).xlsx'
 logo_path = 'ProRail logo.png'
-pdf_file_path = 'User_Guide(1).pdf'
+pdf_file_path = 'User_Guide (1).pdf'
 
 # Load the data from the template
 df = pd.read_excel(file_path, sheet_name='Template')
