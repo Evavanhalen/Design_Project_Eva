@@ -777,7 +777,7 @@ with col2:
             cluster_mean = pd.concat([cluster_analysis.loc[i], non_numerical_analysis.loc[i]])
             if st.button(f'Cluster {i} in Real tracks'):
                 display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
-    else:
-        st.warning(f"Cluster {i+1} not found due to filtering in left menu. Remove some filters to obtain up to 5 clusters.")
+        	else:
+                st.warning(f"Cluster {i} not found due to filtering in left menu. Remove some filters to obtain up to 5 clusters.")
 
     
