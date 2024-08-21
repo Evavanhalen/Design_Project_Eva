@@ -771,9 +771,13 @@ with col1:
 
 with col2:
     st.subheader('Find a real-life match')
-    for i in range(5):
-        cluster_mean = pd.concat([cluster_analysis.loc[i], non_numerical_analysis.loc[i]])
-        if st.button(f'Cluster {i} in Real tracks'):
-            display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
+    # Loop over the existing clusters instead of assuming indices
+        for i in cluster_analysis.index:
+            if i in non_numerical_analysis.index:
+                cluster_mean = pd.concat([cluster_analysis.loc[i], non_numerical_analysis.loc[i]])
+                    if st.button(f'Cluster {i} in Real tracks'):
+                        display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
+    else:
+        st.warning(f"Cluster {i} not found in non_numerical_analysis.")
 
     
