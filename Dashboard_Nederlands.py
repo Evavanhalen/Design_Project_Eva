@@ -126,7 +126,7 @@ percentage_matching_km_tracks = (filtered_km_tracks / total_km_tracks) * 100
 
 # Assuming track_length is a column in your DataFrame
 total_track_length = df['Baanvaklengt (km)'].sum()
-filtered_track_length = filtered_df['Baanvaklengt (km))'].sum()
+filtered_track_length = filtered_df['Baanvaklengt (km)'].sum()
 percentage_matching_track_length = (filtered_track_length / total_track_length) * 100
 
 # Visualization Options
