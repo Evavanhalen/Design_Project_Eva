@@ -19,7 +19,7 @@ from sklearn.metrics import euclidean_distances
 warnings.filterwarnings("ignore", category=FutureWarning, module='seaborn._oldcore')
 
 # Definieer bestandspaden met relatieve paden
-file_path = 'Template_V03 (6).xlsx'
+file_path = 'Nederlands_Template.xlsx'
 logo_path = 'ProRail logo.png'
 
 # Laad de gegevens uit de template
