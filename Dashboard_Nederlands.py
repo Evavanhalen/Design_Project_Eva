@@ -41,7 +41,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Beschrijvende kolommen die altijd moeten worden opgenomen
-descriptive_columns = ['Track Section', 'Geocode', 'To', 'From']
+descriptive_columns = ['Baanvak', 'Geocode', 'Van', 'Tot']
 
 # Zijbalk voor kolomselectie met selectievakjes
 st.sidebar.title('Kolommen en Filters In- of Uitschakelen Bla Bla')
