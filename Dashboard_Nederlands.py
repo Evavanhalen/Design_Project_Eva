@@ -238,24 +238,23 @@ if 'Gemiddeld Baanvak' in graph_options:
 
     # Plotting the mean values for numerical columns
     with col1:
-        st.subheader('Numerical Columns')
+        st.subheader('Numerieke Kolommen')
         fig, ax = plt.subplots()
         mean_numerical_values.plot(kind='bar', ax=ax)
-        ax.set_ylabel('Mean Value')
-        ax.set_title('Mean Values of Numerical Columns')
+        ax.set_ylabel('Gemiddelde Waarde')
+        ax.set_title('Gemiddelde Waardes van Numerieke Kolommen')
         st.pyplot(fig)
 
     # Displaying the mode values in a table format for non-numerical columns
     with col2:
-        st.subheader('Categorical Columns')
+        st.subheader('Categorische Kolommen')
         st.table(mode_non_numerical_values)
 
         # Button to display histograms
-    with st.expander('📊 Click here for statistical distribution insights'):
-        st.subheader('Histograms for Distribution of Numerical Features')
+    with st.expander('📊 Klik hier voor inzichten in de statistische verdelingen'):
+        st.subheader('Histogrammen voor verdelingen van numerieke kenmerken')
         st.markdown("""
-        Histograms provide a visual representation of the distribution of numerical features in the dataset. They show how the data points are spread across different values, which helps in understanding the underlying patterns and distributions of the data.
-        """)
+    Histogrammen geven een visuele voorstelling van de verdeling van numerieke kenmerken in de dataset. Ze laten zien hoe de gegevenspunten verdeeld zijn over verschillende waarden, wat helpt om de onderliggende patronen en verdelingen van de gegevens te begrijpen.        """)
 
         # Display histograms in a smaller size with 3 columns
         numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns  
@@ -297,7 +296,7 @@ def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, 
     similarities = calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols)
     df['Similarity'] = similarities
     similar_tracks = df.nlargest(10, 'Similarity')  # Show top 10 similar tracks
-    st.write(f"Top 10 tracks similar to the {section_type} Mean Track Section")
+    st.write(f"Top 10 baanvakken die het meest lijken op het {section_type} gemiddelde baanvak")
     st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_cols) + list(non_numerical_cols)])
     df.drop(columns=['Similarity'], inplace=True)  # Clean up
 
