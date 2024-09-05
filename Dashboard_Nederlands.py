@@ -83,8 +83,8 @@ for column, (include, filter_values) in column_inclusion.items():
             filtered_df = filtered_df.join(df[df[column].isin(filter_values)][[column]], how='inner')
 
 st.title('Baanvakanalyse')            
-st.markdown("Dit is een interactief Dashboard dat verschillende treinbaanvakken in Nederland laat zien. De gebruiker kan bepaalde kenmerken in- en uitsluiten”
-            “van elke statistische analyse en filteren op basis van numerieke of niet-numerieke waarden. De gebruiker kan het type visualisatie selecteren dat hij wil zien. Voor meer gedetailleerde informatie over het dashbaord kunt u hieronder de gebruikershandleiding downloaden.")
+st.markdown("Dit is een interactief Dashboard dat verschillende treinbaanvakken in Nederland laat zien. De gebruiker kan bepaalde kenmerken in- en uitsluiten"
+            "van elke statistische analyse en filteren op basis van numerieke of niet-numerieke waarden. De gebruiker kan het type visualisatie selecteren dat hij wil zien. Voor meer gedetailleerde informatie over het dashbaord kunt u hieronder de gebruikershandleiding downloaden.")
 
 with open(pdf_file_path, "rb") as f:
     pdf_data = f.read()
