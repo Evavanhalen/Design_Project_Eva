@@ -81,7 +81,7 @@ for column, (include, filter_values) in column_inclusion.items():
         else:
             filtered_df = filtered_df.join(df[df[column].isin(filter_values)][[column]], how='inner')
 
-st.title('Analyse van Treinsecties')            
+st.title('Analyse van Treinsecties in het Nederlands')            
 st.markdown("Dit is een interactief dashboard dat verschillende treinsecties in Nederland presenteert. De gebruiker kan bepaalde kenmerken in- of uitschakelen"
             "voor elke statistische analyse en filteren op basis van numerieke of niet-numerieke waarden. De gebruiker kan het type visualisatie selecteren dat hij wil zien.")
 # Hoofdinhoud
