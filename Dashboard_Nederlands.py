@@ -45,7 +45,7 @@ st.markdown("""
 descriptive_columns = ['Baanvak', 'Geocode', 'Van', 'Tot']
 
 # Sidebar for column selection using checkboxes
-st.sidebar.title('Include/Exclude Columns and Filters')
+st.sidebar.title('Opnemen/Uitsluiten bepaalde kolommen en filters')
 
 # Dictionary to hold the inclusion state and filter values
 column_inclusion = {}
@@ -58,14 +58,14 @@ for column in df.columns:
     
     # Check the data type to decide on multiselect or slider
     if pd.api.types.is_numeric_dtype(df[column]):
-        include_column = st.sidebar.checkbox(f"Include {column}", value=True, key=f"{column}_include")
+        include_column = st.sidebar.checkbox(f"Openemen {column}", value=True, key=f"{column}_include")
         if include_column:
             min_val = df[column].min()
             max_val = df[column].max()
             filter_values = st.sidebar.slider(f'{column}', min_val, max_val, (min_val, max_val), key=f"{column}_filter")
             column_inclusion[column] = (include_column, filter_values)
     else:
-        include_column = st.sidebar.checkbox(f"Include {column}", value=True, key=f"{column}_include")
+        include_column = st.sidebar.checkbox(f"Opnemen {column}", value=True, key=f"{column}_include")
         if include_column:
             filter_values = st.sidebar.multiselect(f'{column}', df[column].unique(), default=df[column].unique(), key=f"{column}_filter")
             column_inclusion[column] = (include_column, filter_values)
@@ -82,24 +82,24 @@ for column, (include, filter_values) in column_inclusion.items():
         else:
             filtered_df = filtered_df.join(df[df[column].isin(filter_values)][[column]], how='inner')
 
-st.title('Train Track Section Analysis')            
-st.markdown("This is an interactive Dashboard presenting different train track sections in the Netherlands. The user is able to include and exclude certain characteristics"
-            "from any statistical analysis and filter based on numerical or non-numerical values. The user can select the type of visualization they wish to see. For more detailed information into the dashbaord, please download the user guide below.")
+st.title('Baanvakanalyse')            
+st.markdown("Dit is een interactief Dashboard dat verschillende treinbaanvakken in Nederland laat zien. De gebruiker kan bepaalde kenmerken in- en uitsluiten”
+            “van elke statistische analyse en filteren op basis van numerieke of niet-numerieke waarden. De gebruiker kan het type visualisatie selecteren dat hij wil zien. Voor meer gedetailleerde informatie over het dashbaord kunt u hieronder de gebruikershandleiding downloaden.")
 
 with open(pdf_file_path, "rb") as f:
     pdf_data = f.read()
 
 # Create a download button
 st.download_button(
-    label="📕Download User Guide",
+    label="📕Download Gebruikershandleiding",
     data=pdf_data,
     file_name="User_Guide.pdf",
     mime="application/pdf"
 )
 
 # Main content
-with st.expander("🗺️ Click here to view the Map of Train Track Sections"):
-    st.subheader('Map of Train Track Sections')
+with st.expander("🗺️ Klik hier om de kaart van de baanvakken te zien"):
+    st.subheader('Kaart van de Baanvakken')
     # Load and display the ProRail logo
     map_path = '67.png'
     map = Image.open(map_path)
@@ -110,10 +110,9 @@ st.markdown("""
     <h1 style='font-size:2.5em; color:navy;'>Filtering Section</h1>
     <hr style='border:2px solid navy;'>
     """, unsafe_allow_html=True)
-st.markdown("This dashboard allows the user to filter train track sections based on the filter options on the left side of the dashboard. The table shows which track sections match the chosen criteria.")
-
-with st.expander("🔎 Click here to view the filtered track sections"):
-    st.write(f"Number of tracks matching criteria: {filtered_df.shape[0]}")
+st.markdown("Met dit dashboard kan de gebruiker treinbaanvakken filteren op basis van de filteropties aan de linkerkant van het dashboard. De tabel laat zien welke baanvakken voldoen aan de gekozen criteria.")
+with st.expander("🔎 Klik hier om de gefilterde baanvakken te zien"):
+    st.write(f"Aantal baanvakken die overeenkomen met de criteria: {filtered_df.shape[0]}")
     st.write(filtered_df)
 
 
@@ -121,26 +120,26 @@ total_tracks_count = df.shape[0]
 filtered_tracks_count = filtered_df.shape[0]
 percentage_matching_tracks = (filtered_tracks_count / total_tracks_count) * 100
 
-total_km_tracks = df['km track'].sum()
-filtered_km_tracks = filtered_df['km track'].sum()
+total_km_tracks = df['km spoor'].sum()
+filtered_km_tracks = filtered_df['km spoor'].sum()
 percentage_matching_km_tracks = (filtered_km_tracks / total_km_tracks) * 100
 
 # Assuming track_length is a column in your DataFrame
-total_track_length = df['Track length (km)'].sum()
-filtered_track_length = filtered_df['Track length (km)'].sum()
+total_track_length = df['Baanvaklengt (km)'].sum()
+filtered_track_length = filtered_df['Baanvaklengt (km))'].sum()
 percentage_matching_track_length = (filtered_track_length / total_track_length) * 100
 
 # Visualization Options
-st.subheader('Visualization Options')
+st.subheader('Visualisatie Opties')
 graph_options = st.multiselect(
-    'Select the graphs you want to see:',
-    ['Pie Chart (Count)', 'Pie Chart (KM/Length)', 'Mean Train Track Section']
+    'Selecteer de grafieken die je wilt zien:',
+    ['Taartdiagram (Aantal)', 'Taartdiagram (KM/Lengte)', 'Gemiddeld Baanvak']
 )
 
 # Toggle between Track Length and Track KM for Pie Chart
 track_measurement = st.radio(
-    "Select the measurement for the second pie chart:",
-    ('Track Kilometers', 'Track Length'),
+    "Selecteer de eenheid voor het tweede taartdiagram:",
+    ('Baanvak kilometers', 'Baanvak lengte'),
     key="track_measurement_toggle"  # Add a unique key here
 )
 
@@ -158,79 +157,77 @@ relevant_columns = df.loc[:, 'Emplacement':]
 # Create two columns
 col1, col2 = st.columns(2)
 
-if 'Pie Chart (Count)' in graph_options:
+if 'Taartdiagram (Aantal)' in graph_options:
     with col1:
-        st.subheader('Distribution of Matching Tracks (Count)')
-        st.markdown("The pie chart shows the number of tracks that match the user-specified criteria")
+        st.subheader('Verdeling van overeenkomende baanvakken (aantal)')
+        st.markdown(“Het taartdiagram toont het aantal baanvakken dat voldoet aan de door de gebruiker opgegeven criteria”)        
         fig1, ax1 = plt.subplots(figsize=(4, 4))  # Adjust the size as needed
         ax1.pie([filtered_tracks_count, total_tracks_count - filtered_tracks_count],
-                labels=['Matching', 'Not Matching'], autopct='%1.1f%%', startangle=90)
+                labels=['Overeenkomend', 'Niet overeenkomend'], autopct='%1.1f%%', startangle=90)
         ax1.axis('equal')
         st.pyplot(fig1)
-        st.write(f"Total tracks: {total_tracks_count}")
-        st.write(f"Tracks matching criteria: {filtered_tracks_count}")
-        st.write(f"Percentage matching criteria: {percentage_matching_tracks:.2f}%")
+        st.write(f"Totaal aantal baanvakken: {total_tracks_count}")
+        st.write(f"Aantal baanvakken wat overeenkomt met filteringscriteria: {filtered_tracks_count}")
+        st.write(f"Percentage baanvakken dat overeenkomt met filteringscriteria: {percentage_matching_tracks:.2f}%")
 
 # Conditional display for Pie chart (KM/Length)
-if 'Pie Chart (KM/Length)' in graph_options:
+if 'Taartdiagram (KM/Lengte)' in graph_options:
     with col2:
         if track_measurement == 'Track Kilometers':
-            st.subheader('Distribution of Matching Tracks (KM)')
-            st.markdown("The pie chart shows the kilometer of track that match the user-specified criteria")
+            st.subheader('Verdeling van overeenkomende baanvakken (km)')
+            st.markdown(“Het taartdiagram toont het aantal baanvakken dat voldoet aan de door de gebruiker opgegeven criteria”)        
             fig2, ax2 = plt.subplots(figsize=(4, 4))  # Adjust the size as needed
             ax2.pie([filtered_km_tracks, total_km_tracks - filtered_km_tracks],
-                    labels=['Matching', 'Not Matching'], autopct='%1.1f%%', startangle=90)
+                    labels=['Overeenkomend', 'Niet Overeenkomend'], autopct='%1.1f%%', startangle=90)
             ax2.axis('equal')
             st.pyplot(fig2)
-            st.write(f"Total km of tracks: {total_km_tracks:.2f} km")
-            st.write(f"Km of tracks matching criteria: {filtered_km_tracks:.2f} km")
-            st.write(f"Percentage of km tracks matching criteria: {percentage_matching_km_tracks:.2f}%")
+            st.write(f"Totaal aantal spoorkilometers: {total_km_tracks:.2f} km")
+            st.write(f"Kilometers baanvakken dat overeenkomt met de criteria: {filtered_km_tracks:.2f} km")
+            st.write(f"Percentage kilometeres dat overeenkomt met de criteria: {percentage_matching_km_tracks:.2f}%")
         else:
-            st.subheader('Distribution of Matching Tracks (Track Length)')
-            st.markdown("The pie chart shows the total track length that matches the user-specified criteria")
+            st.subheader('Verdeling van overeenkomende baanvakken (Baanvak lengte)')
+            st.markdown(“Het taartdiagram toont het aantal baanvakken dat voldoet aan de door de gebruiker opgegeven criteria”)        
             fig2, ax2 = plt.subplots(figsize=(4, 4))  # Adjust the size as needed
             ax2.pie([filtered_track_length, total_track_length - filtered_track_length],
-                    labels=['Matching', 'Not Matching'], autopct='%1.1f%%', startangle=90)
+                    labels=['Overeenkomend', 'Niet overeenkomend'], autopct='%1.1f%%', startangle=90)
             ax2.axis('equal')
             st.pyplot(fig2)
-            st.write(f"Total track length: {total_track_length:.2f} units")
-            st.write(f"Track length matching criteria: {filtered_track_length:.2f} units")
-            st.write(f"Percentage matching track length: {percentage_matching_track_length:.2f}%")
+            st.write(f"Totale baanvaklengte: {total_track_length:.2f} units")
+            st.write(f"Baanvaklengte die overeenkomt met de criteria: {filtered_track_length:.2f} units")
+            st.write(f"Percentage baanvaklengte die overeenkomt met de criteria: {percentage_matching_track_length:.2f}%")
 
 
 # Mean Train Track Section
-if 'Mean Train Track Section' in graph_options:
-    st.subheader('Mean Train Track Section')
-    with st.expander("📖 Click here for a detailed explanation of Mean Track Results"):
+if 'Gemiddeld Baanvak' in graph_options:
+    st.subheader('Gemiddeld Baanvak')
+    with st.expander("📖 Klik hier voor een gedetailleerde uitleg van het gemiddelde baanvak"):
         st.markdown("""
-    ## Mean Track Results
+    ## Gemiddeld Baanvak
 
-    The mean track results provide a summary of the average values for both numerical and non-numerical features of the train tracks. This information helps in understanding the typical characteristics of the track sections under consideration.
+    In deze resultaten is een samenvatting te vinden van de gemiddelde waardes voor de numeriek en niet-numerieke eigenschappen van een baanvak.
 
-    **Numerical Columns:**
-    - These columns contain numerical data such as track length, number of signals, etc.
-    - The mean value is calculated for each numerical column.
-    - This provides an idea of the central tendency of the numerical features across the dataset.
+    **Numerieke kolommen:**
+    - Deze kolommen bevatten numerieke gegevens zoals spoorlengte, aantal seinen, enz.
+    - Voor elke numerieke kolom wordt de gemiddelde waarde berekend.
+    - Dit geeft een idee van de centrale tendens van de numerieke kenmerken in de dataset.
 
-    **Non-Numerical Columns:**
-    - These columns contain categorical data such as the type of track, safety system, etc.
-    - The mode (most frequent value) is calculated for each non-numerical column.
-    - This gives an insight into the most common categories or attributes in the dataset.
+    **Niet-numerieke kolommen:**
+    - Deze kolommen bevatten categorische gegevens zoals het type spoor, veiligheidssysteem, enz.
+    - De modus (meest frequente waarde) wordt berekend voor elke niet-numerieke kolom.
+    - Dit geeft inzicht in de meest voorkomende categorieën of attributen in de dataset.
 
-    ### Key Points to Consider:
+    ### Belangrijke aandachtspunten:
 
-    **Numerical Columns:**
-    - **Mean Value**: Represents the average value of the numerical features. It is calculated by summing all the values in a column and dividing by the number of values.
-    - **Interpretation**: The mean value provides a central value around which the data points are distributed.
+    **Numerieke kolommen:**
+    - Gemiddelde waarde**: Geeft de gemiddelde waarde van de numerieke kenmerken weer. Deze wordt berekend door alle waarden in een kolom op te tellen en te delen door het aantal waarden.
 
-    **Non-Numerical Columns:**
-    - **Mode Value**: Represents the most frequent value or category in the non-numerical features.
-    - **Interpretation**: The mode value helps in identifying the most common category within the dataset.
+- **Interpretatie**: De gemiddelde waarde biedt een centrale waarde waarrond de gegevenspunten zijn verdeeld.
 
-    ### Visualization and Analysis:
+**Niet-numerieke kolommen:**
+- **Waarde**: Vertegenwoordigt de meest voorkomende waarde of categorie in de niet-numerieke kenmerken.- **Interpretatie**: De moduswaarde helpt bij het identificeren van de meest voorkomende categorie binnen de dataset.    ### Visualisatie en analyse:
 
-    - **Bar Charts for Numerical Columns**: Visual representations of the mean values for numerical columns help in easily comparing the average values across different features.
-    - **Tables for Non-Numerical Columns**: Displaying the mode values in a table format allows for a clear understanding of the most frequent categories.
+    - **Balkdiagrammen voor numerieke kolommen**: Visuele weergaven van de gemiddelde waarden voor numerieke kolommen helpen bij het eenvoudig vergelijken van de gemiddelde waarden over verschillende kenmerken.
+    - **Tabellen voor niet-numerieke kolommen**: Door de gemiddelden in tabelvorm weer te geven, krijgt u een duidelijk beeld van de meest voorkomende categorieën.
         """)
     # Filter the numerical columns based on the selected columns
     numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns
