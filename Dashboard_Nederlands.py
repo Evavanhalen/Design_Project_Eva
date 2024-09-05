@@ -44,7 +44,7 @@ st.markdown("""
 descriptive_columns = ['Track Section', 'Geocode', 'To', 'From']
 
 # Zijbalk voor kolomselectie met selectievakjes
-st.sidebar.title('Kolommen en Filters In- of Uitschakelen')
+st.sidebar.title('Kolommen en Filters In- of Uitschakelen Bla Bla')
 
 # Woordenboek om de inclusiestatus en filterwaarden op te slaan
 column_inclusion = {}
