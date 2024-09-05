@@ -735,7 +735,7 @@ if '3D PCA' in graph_options or 'Pie Chart' in graph_options:
 
             fig, ax = plt.subplots(figsize=(4, 4), dpi=200)  # Reduced size and high DPI for better quality
             ax.pie(cluster_counts, labels=cluster_counts.index, autopct='%1.1f%%', startangle=90, textprops={'fontsize': 6})
-            ax.set_title('Cluster Distribution', fontsize=10)
+            ax.set_title('Cluster Verdeling', fontsize=10)
             st.pyplot(fig)
 
 
@@ -750,28 +750,28 @@ col1, col2 = st.columns([2, 3])
 col1, col2 = st.columns([2, 3])
 
 with col1:
-    st.subheader('Download to Excel')
+    st.subheader('Download naar Excel')
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         if not cluster_analysis.empty:
-            cluster_analysis.to_excel(writer, sheet_name='Cluster_Summary')
+            cluster_analysis.to_excel(writer, sheet_name='Cluster_Samenvatting')
         if not non_numerical_analysis.empty:
-            non_numerical_analysis.to_excel(writer, sheet_name='Non_Numerical_Summary')
+            non_numerical_analysis.to_excel(writer, sheet_name='Niet_Numerieke_Samenvatting')
     output.seek(0)
     st.download_button(
-        label="Download Summary of K-Means Clusters to Excel",
+        label="Download Samenvatting van K-Means Clusters naar Excel",
         data=output,
         file_name="K_Means_Clusters.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
 with col2:
-    st.subheader('Find a real-life match')
+    st.subheader('Vind een levenechte match')
     # Loop over the existing clusters instead of assuming indices
     for i in cluster_analysis.index:
         if i in non_numerical_analysis.index:
             cluster_mean = pd.concat([cluster_analysis.loc[i], non_numerical_analysis.loc[i]])
-            if st.button(f'Cluster {i} in Real tracks'):
+            if st.button(f'Cluster {i} in echte baanvakken'):
                 display_similar_tracks(df, cluster_mean, included_numerical_cols, included_non_numerical_cols, f'Cluster {i}')
         else:
             st.warning(f"Cluster {i} not found due to filtering in left menu. Remove some filters to obtain up to 5 clusters.")
