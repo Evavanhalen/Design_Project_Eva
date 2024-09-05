@@ -160,7 +160,7 @@ col1, col2 = st.columns(2)
 if 'Taartdiagram (Aantal)' in graph_options:
     with col1:
         st.subheader('Verdeling van overeenkomende baanvakken (aantal)')
-        st.markdown(“Het taartdiagram toont het aantal baanvakken dat voldoet aan de door de gebruiker opgegeven criteria”)        
+        st.markdown("Het taartdiagram toont het aantal baanvakken dat voldoet aan de door de gebruiker opgegeven criteria")        
         fig1, ax1 = plt.subplots(figsize=(4, 4))  # Adjust the size as needed
         ax1.pie([filtered_tracks_count, total_tracks_count - filtered_tracks_count],
                 labels=['Overeenkomend', 'Niet overeenkomend'], autopct='%1.1f%%', startangle=90)
@@ -175,7 +175,7 @@ if 'Taartdiagram (KM/Lengte)' in graph_options:
     with col2:
         if track_measurement == 'Track Kilometers':
             st.subheader('Verdeling van overeenkomende baanvakken (km)')
-            st.markdown(“Het taartdiagram toont het aantal baanvakken dat voldoet aan de door de gebruiker opgegeven criteria”)        
+            st.markdown("Het taartdiagram toont het aantal baanvakken dat voldoet aan de door de gebruiker opgegeven criteria")        
             fig2, ax2 = plt.subplots(figsize=(4, 4))  # Adjust the size as needed
             ax2.pie([filtered_km_tracks, total_km_tracks - filtered_km_tracks],
                     labels=['Overeenkomend', 'Niet Overeenkomend'], autopct='%1.1f%%', startangle=90)
@@ -186,7 +186,7 @@ if 'Taartdiagram (KM/Lengte)' in graph_options:
             st.write(f"Percentage kilometeres dat overeenkomt met de criteria: {percentage_matching_km_tracks:.2f}%")
         else:
             st.subheader('Verdeling van overeenkomende baanvakken (Baanvak lengte)')
-            st.markdown(“Het taartdiagram toont het aantal baanvakken dat voldoet aan de door de gebruiker opgegeven criteria”)        
+            st.markdown("Het taartdiagram toont het aantal baanvakken dat voldoet aan de door de gebruiker opgegeven criteria")        
             fig2, ax2 = plt.subplots(figsize=(4, 4))  # Adjust the size as needed
             ax2.pie([filtered_track_length, total_track_length - filtered_track_length],
                     labels=['Overeenkomend', 'Niet overeenkomend'], autopct='%1.1f%%', startangle=90)
