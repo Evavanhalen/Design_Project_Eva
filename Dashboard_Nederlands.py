@@ -108,8 +108,8 @@ total_tracks_count = df.shape[0]
 filtered_tracks_count = filtered_df.shape[0]
 percentage_matching_tracks = (filtered_tracks_count / total_tracks_count) * 100
 
-total_km_tracks = df['km track'].sum()
-filtered_km_tracks = filtered_df['km track'].sum()
+total_km_tracks = df['km spoor'].sum()
+filtered_km_tracks = filtered_df['km spoor'].sum()
 percentage_matching_km_tracks = (filtered_km_tracks / total_km_tracks) * 100
 
 # Visualisatieopties
@@ -325,9 +325,9 @@ graph_options = st.multiselect(
 numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns.difference(descriptive_columns)
 non_numerical_cols = filtered_df.select_dtypes(exclude=[float, int]).columns.difference(descriptive_columns)
 
-mean_numerical = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].mean()
-mode_non_numerical = filtered_df.groupby('Urban/Regional/Suburban')[non_numerical_cols].agg(lambda x: x.mode()[0])
-grouped_stds = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].std()
+mean_numerical = filtered_df.groupby('Stedelijk/Voorstedelijk/Regionaal')[numerical_cols].mean()
+mode_non_numerical = filtered_df.groupby('Stedelijk/Voorstedelijk/Regionaal')[non_numerical_cols].agg(lambda x: x.mode()[0])
+grouped_stds = filtered_df.groupby('Stedelijk/Voorstedelijk/Regionaal')[numerical_cols].std()
 
 # Combineer numerieke en niet-numerieke samenvattingen
 summary_numerical = mean_numerical
@@ -383,7 +383,7 @@ if 'Numerieke Gemiddelden per Categorie' in graph_options:
             axes = axes.flatten()
 
             for i, col in enumerate(columns):
-                sns.boxplot(x='Urban/Regional/Suburban', y=col, data=df, ax=axes[i])
+                sns.boxplot(x='Stedelijk/Voorstedelijk/Regionaal', y=col, data=df, ax=axes[i])
                 axes[i].set_title(f'Verdeling van {col}', fontsize=10, pad=10)
                 axes[i].set_ylabel(col, fontsize=8)
                 axes[i].set_xlabel('')
@@ -452,7 +452,7 @@ if 'Niet-Numerieke Modus per Categorie' in graph_options:
 # Visualisatiefunctie voor numerieke gegevens
 def plot_numerical_summary(summary, title):
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
-    categories = ['Urban', 'Regional', 'Suburban']
+    categories = ['Stedelijk', 'Voorstedelijk', 'Regionaal']
 
     for i, category in enumerate(categories):
         summary.loc[category].plot(kind='bar', ax=axes[i])
@@ -469,7 +469,7 @@ def plot_numerical_summary(summary, title):
 
 if 'Numerieke Samenvatting' in graph_options:
     st.subheader('Samenvatting van Numerieke Kenmerken per Categorie')
-    plot_numerical_summary(summary_numerical, 'Gemiddelde Stedelijke/Regionale/Suburbane Treinsecties')
+    plot_numerical_summary(summary_numerical, 'Gemiddelde Stedelijk/Voorstedelijk/Regionaal Treinsecties')
 
 # Functie Definities (geplaatst buiten de lay-out)
 def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
@@ -533,15 +533,15 @@ with col1:
 with col2:
     st.subheader('Vind een real-life match')
     if st.button('Stedelijke Spoorsectie in Werkelijke Sporen'):
-        urban_mean = pd.concat([mean_numerical.loc['Urban'], mode_non_numerical.loc['Urban']])
+        urban_mean = pd.concat([mean_numerical.loc['Stedelijk'], mode_non_numerical.loc['Stedelijk']])
         display_similar_tracks(df, urban_mean, included_numerical_cols, included_non_numerical_cols, 'Stedelijk')
 
     if st.button('Suburbane Spoorsectie in Werkelijke Sporen'):
-        suburban_mean = pd.concat([mean_numerical.loc['Suburban'], mode_non_numerical.loc['Suburban']])
+        suburban_mean = pd.concat([mean_numerical.loc['Voorstedelijk'], mode_non_numerical.loc['Voorstedelijk']])
         display_similar_tracks(df, suburban_mean, included_numerical_cols, included_non_numerical_cols, 'Suburbaan')
 
     if st.button('Regionale Spoorsectie in Werkelijke Sporen'):
-        regional_mean = pd.concat([mean_numerical.loc['Regional'], mode_non_numerical.loc['Regional']])
+        regional_mean = pd.concat([mean_numerical.loc['Regionaal'], mode_non_numerical.loc['Regionaal']])
         display_similar_tracks(df, regional_mean, included_numerical_cols, included_non_numerical_cols, 'Regionaal')
 
 
