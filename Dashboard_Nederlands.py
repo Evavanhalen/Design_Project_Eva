@@ -297,8 +297,8 @@ def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, 
     df['Similarity'] = similarities
     similar_tracks = df.nlargest(10, 'Similarity')  # Show top 10 similar tracks
     st.write(f"Top 10 baanvakken die het meest lijken op het {section_type} gemiddelde baanvak")
-    st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_cols) + list(non_numerical_cols)])
-    df.drop(columns=['Similarity'], inplace=True)  # Clean up
+    st.write(similar_tracks[['Baanvak', 'Gelijkenis'] + list(numerical_cols) + list(non_numerical_cols)])
+    df.drop(columns=['Gelijkenis'], inplace=True)  # Clean up
 
 # Filtering and inclusion logic (this should be placed before the column layout to ensure variables are available)
 included_numerical_cols = []  # Initialize as an empty list
@@ -316,53 +316,53 @@ for column, (include, filter_values) in column_inclusion.items():
 col1, col2 = st.columns([2, 3])
 
 with col1:
-    st.subheader('Download to Excel')
+    st.subheader('Download naar Excel')
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        mean_track_section.to_excel(writer, sheet_name='Mean Track Section')
+        mean_track_section.to_excel(writer, sheet_name='Gemiddeld Baanvak')
     output.seek(0)
     st.download_button(
-        label="Download Summary of Mean Track to Excel",
+        label="Download gemiddeld baanvakdata naar Excel",
         data=output,
-        file_name="Mean_Track_Summary.xlsx",
+        file_name="Gemiddel_Baanvak.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
 with col2:
-    st.subheader('Find a real-life match')
-    if st.button('Mean Track Section in Real tracks'):
+    st.subheader('Vind een echt baanvak als match')
+    if st.button('Gemiddeld baanvak in echte baanvakken'):
         display_similar_tracks(df, mean_track_section, included_numerical_cols, included_non_numerical_cols, 'Mean')
 
 
 # Add a title and description
 st.markdown("""
-    <h1 style='font-size:2.4em; color:darkgreen;'>Urban/Suburban/Regional Train Tracks </h1>
+    <h1 style='font-size:2.4em; color:darkgreen;'> Stedelijk/Voorstedelijk/Regionaal Baanvakken </h1>
     <hr style='border:2px solid darkgreen;'>
     """, unsafe_allow_html=True)
 st.markdown("""
-    This dashboard allows you to analyze and visualize various features of train tracks categorized into urban, suburban, and regional types.
+    Met dit dashboard kun je verschillende kenmerken van baanvakken analyseren en visualiseren, ingedeeld in stedelijke, voorstedelijke en regionale typen.
 
-    **Instructions:**
-    1. Use the sidebar to include or exclude specific features in the analysis.
-    2. Choose whether to exclude emplacement data.
-    3. Select the types of plots you want to display.
-    4. The dashboard provides options to display means, distributions, and summaries of numerical and non-numerical features.
+    **Instructies:**
+    1. Gebruik de zijbalk om specifieke kenmerken in de analyse op te nemen of uit te sluiten.
+    2. Kies of je verplaatsingsgegevens wilt uitsluiten.
+    3. Selecteer de typen plots die je wilt weergeven.
+    4. Het dashboard biedt opties om gemiddelden, verdelingen en samenvattingen van numerieke en niet-numerieke kenmerken weer te geven.
 
-    **Note:** The data is filtered based on the selections you make in the sidebar.
+    **Opmerking:** De gegevens worden gefilterd op basis van de selecties die je maakt in de zijbalk.
 """)
 # Visualization Options
-st.subheader('Visualization Options')
+st.subheader('Visualisatie Opties')
 graph_options = st.multiselect(
     'Select the graphs you want to see:',
-    ['Numerical Means by Category', 'Non-Numerical Modes by Category', 'Numerical Summary']
+    ['Numerieke Gemiddeldes per Categorie', 'Niet-Numerieke Modi per Categorie', 'Numerieke Samenvatting']
 )
 # Group by 'Urban/Regional/Suburban' and calculate mean and standard deviation for numerical features and most frequent value for non-numerical features
 numerical_cols = filtered_df.select_dtypes(include=[float, int]).columns.difference(descriptive_columns)
 non_numerical_cols = filtered_df.select_dtypes(exclude=[float, int]).columns.difference(descriptive_columns)
 
-mean_numerical = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].mean()
-mode_non_numerical = filtered_df.groupby('Urban/Regional/Suburban')[non_numerical_cols].agg(lambda x: x.mode()[0])
-grouped_stds = filtered_df.groupby('Urban/Regional/Suburban')[numerical_cols].std()
+mean_numerical = filtered_df.groupby('Stedelijk/Voorstedelijk/Regionaal')[numerical_cols].mean()
+mode_non_numerical = filtered_df.groupby('Stedelijk/Voorstedelijk/Regionaal')[non_numerical_cols].agg(lambda x: x.mode()[0])
+grouped_stds = filtered_df.groupby('Stedelijk/Voorstedelijk/Regionaal')[numerical_cols].std()
 
 # Handle the case where there is never a standard deviation for the regional track type
 for col in grouped_stds.columns:
@@ -390,11 +390,11 @@ def plot_all_numerical_features(mean_values, std_values, categories, group_size=
             ax = axes[i]
             means = mean_values[col]
             errors = std_values[col]
-            ax.errorbar(categories, means, yerr=errors, fmt='o', color='blue', capsize=5, label='Standard Deviation')
+            ax.errorbar(categories, means, yerr=errors, fmt='o', color='blue', capsize=5, label='Standaard Deviatie')
             ax.scatter(categories, means, color='red', zorder=5, label=f'{col} (Mean)')
-            ax.set_title(f'Means of {col} by Urban/Regional/Suburban Category')
-            ax.set_ylabel(f'Mean {col}')
-            ax.set_xlabel('Urban/Regional/Suburban Category')
+            ax.set_title(f'Gemiddeldes van {col} per Stedelijk/Voorstedelijk/Regionaal Categorie')
+            ax.set_ylabel(f'Gemiddelde {col}')
+            ax.set_xlabel('Stedelijk/Voorstedelijk/Regionaal Categorie')
             ax.legend(loc='upper right')
             ax.tick_params(axis='x', rotation=45)
 
@@ -404,16 +404,16 @@ def plot_all_numerical_features(mean_values, std_values, categories, group_size=
 
         plt.tight_layout(pad=3.1)
         fig.subplots_adjust(top=0.9)
-        fig.suptitle(f'Means of Numerical Features from {start_idx + 1} to {end_idx} by Urban/Regional/Suburban Category', fontsize=16)
+        fig.suptitle(f'Gemiddeldes van Numerieke Kenmerken van {start_idx + 1} tot {end_idx} per Stedelijk/Voorstedelijk/Regionaal Categorie', fontsize=16)
         st.pyplot(fig)
         plt.close(fig)
         
 
-if 'Numerical Means by Category' in graph_options:
+if 'Numerieke Gemiddeldes per Categorie' in graph_options:
     plot_all_numerical_features(mean_numerical, grouped_stds, mean_numerical.index)
 
     # Add an expander for numerical distributions
-    with st.expander("📊 Click here for detailed numerical distributions"):
+    with st.expander("📊 Klik hier voor gedetailleerde numerieke verdelingen"):
         # Define the function to plot distributions
         def plot_distributions(columns, df, title, cols=3):
             num_plots = len(columns)
@@ -423,8 +423,8 @@ if 'Numerical Means by Category' in graph_options:
             axes = axes.flatten()
 
             for i, col in enumerate(columns):
-                sns.boxplot(x='Urban/Regional/Suburban', y=col, data=df, ax=axes[i])
-                axes[i].set_title(f'Distribution of {col}', fontsize=10, pad=10)
+                sns.boxplot(x='Stedelijk/Voorstedelijk/Regionaal', y=col, data=df, ax=axes[i])
+                axes[i].set_title(f'Verdeling van {col}', fontsize=10, pad=10)
                 axes[i].set_ylabel(col, fontsize=8)
                 axes[i].set_xlabel('')
                 axes[i].tick_params(axis='x', labelsize=6)
@@ -451,16 +451,16 @@ if 'Numerical Means by Category' in graph_options:
         # Handle the remaining columns if the division is not perfect
         if end_index < len(numerical_cols):
             remaining_cols = numerical_cols[end_index:]
-            plot_distributions(remaining_cols, filtered_df, 'Distributions of Remaining Numerical Features')
+            plot_distributions(remaining_cols, filtered_df, 'Verdeling van overige numerieke kenmerken')
 
 # Display mode of non-numerical columns by category
-if 'Non-Numerical Modes by Category' in graph_options:
-    st.subheader('Non-Numerical Feature Modes')
-    st.write("Below are the most common values (mode) for the non-numerical features across different track categories.")
+if 'Niet-Numerieke Modi per Categorie' in graph_options:
+    st.subheader('Niet-Numerieke Kenmerken Modi')
+    st.write("Hieronder staan de meest voorkomende waarden (modus) voor de niet-numerieke kenmerken in verschillende spoorcategorieën.")
     st.table(mode_non_numerical)
 
     # Add an expander for detailed non-numerical distributions
-    with st.expander("📊 Click here for detailed non-numerical feature distributions"):
+    with st.expander("📊 Klik hier voor gedetailleerde niet-numerieke functieverdelingen"):
         # Define the function to plot non-numerical distributions
         def plot_non_numerical_distributions(columns, df, title, cols=3):
             num_plots = len(columns)
@@ -470,9 +470,9 @@ if 'Non-Numerical Modes by Category' in graph_options:
             axes = axes.flatten()
 
             for i, col in enumerate(columns):
-                sns.countplot(x='Urban/Regional/Suburban', hue=col, data=df, ax=axes[i])
-                axes[i].set_title(f'Distribution of {col}', fontsize=10, pad=10)
-                axes[i].set_xlabel('Urban/Regional/Suburban Category', fontsize=8)
+                sns.countplot(x='Stedelijk/Voorstedelijk/Regionaal', hue=col, data=df, ax=axes[i])
+                axes[i].set_title(f'Verdeling van {col}', fontsize=10, pad=10)
+                axes[i].set_xlabel('Stedelijk/Voorstedelijk/Regionaal Categorie', fontsize=8)
                 axes[i].tick_params(axis='x', labelsize=6, rotation=45)  # Adjust font size and rotation
                 axes[i].legend(title=col, fontsize=6, title_fontsize=8)  # Adjust legend font size
 
@@ -487,17 +487,17 @@ if 'Non-Numerical Modes by Category' in graph_options:
             plt.close(fig)
 
         # Call the plotting function for non-numerical distributions
-        plot_non_numerical_distributions(non_numerical_cols, filtered_df, 'Non-Numerical Feature Distributions')
+        plot_non_numerical_distributions(non_numerical_cols, filtered_df, 'Niet-numerieke kenmerkverdelingen')
 # Visualization function for numerical data
 def plot_numerical_summary(summary, title):
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
-    categories = ['Urban', 'Regional', 'Suburban']
+    categories = ['Stedelijk', 'Voorstedelijk', 'Regionaal']
 
     for i, category in enumerate(categories):
         summary.loc[category].plot(kind='bar', ax=axes[i])
-        axes[i].set_title(f'Mean {category} Train Track Section')
-        axes[i].set_ylabel('Mean Value')
-        axes[i].set_xlabel('Features')
+        axes[i].set_title(f'Gemiddelde {category} Baanvak')
+        axes[i].set_ylabel('Gemiddelde Waarde')
+        axes[i].set_xlabel('Kenmerk')
         axes[i].tick_params(axis='x', labelsize=8, rotation=90)
 
     plt.suptitle(title, fontsize=16)
@@ -506,9 +506,9 @@ def plot_numerical_summary(summary, title):
     st.pyplot(fig)
     plt.close(fig)
 
-if 'Numerical Summary' in graph_options:
-    st.subheader('Summary of Numerical Features by Category')
-    plot_numerical_summary(summary_numerical, 'Mean Urban/Regional/Suburban Train Track Sections')
+if 'Numerieke Samenvatting' in graph_options:
+    st.subheader('Samenvatting van Numerieke Kenmerken per Categorie')
+    plot_numerical_summary(summary_numerical, 'Gemiddeld Stedelijk/Voorstedelijk/Regionaal Baanvak')
 
 # Function Definitions (placed outside the layout)
 def calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols):
@@ -535,9 +535,9 @@ def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, 
     similarities = calculate_similarity(df, mean_vector, numerical_cols, non_numerical_cols)
     df['Similarity'] = similarities
     similar_tracks = df.nlargest(10, 'Similarity')  # Show top 10 similar tracks
-    st.write(f"Top 10 tracks similar to the {section_type} Mean Track Section")
-    st.write(similar_tracks[['Track Section', 'Similarity'] + list(numerical_cols) + list(non_numerical_cols)])
-    df.drop(columns=['Similarity'], inplace=True)  # Clean up
+    st.write(f"Top 10 baanvakken die het meest lijken op het {section_type} gemiddelde baanvak")
+    st.write(similar_tracks[['Baanvak', 'Gelijkenis'] + list(numerical_cols) + list(non_numerical_cols)])
+    df.drop(columns=['Gelijkenis'], inplace=True)  # Clean up
 
 # Filtering and inclusion logic (this should be placed before the column layout to ensure variables are available)
 included_numerical_cols = []  # Initialize as an empty list
@@ -555,7 +555,7 @@ for column, (include, filter_values) in column_inclusion.items():
 col1, col2 = st.columns([2, 3])
 
 with col1:
-    st.subheader('Download to Excel')
+    st.subheader('Download naar Excel')
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         summary_numerical.to_excel(writer, sheet_name='Numerical Features')
@@ -570,18 +570,18 @@ with col1:
     )
 
 with col2:
-    st.subheader('Find a real-life match')
-    if st.button('Urban Track Section in Real tracks'):
-        urban_mean = pd.concat([mean_numerical.loc['Urban'], mode_non_numerical.loc['Urban']])
-        display_similar_tracks(df, urban_mean, included_numerical_cols, included_non_numerical_cols, 'Urban')
+    st.subheader('Vind een levensechte match')
+    if st.button('Stedelijk baanvak in echte baanvakken'):
+        urban_mean = pd.concat([mean_numerical.loc['Stedelijk'], mode_non_numerical.loc['Stedelijk']])
+        display_similar_tracks(df, urban_mean, included_numerical_cols, included_non_numerical_cols, 'Stedelijk')
 
-    if st.button('Suburban Track Section in Real tracks'):
-        suburban_mean = pd.concat([mean_numerical.loc['Suburban'], mode_non_numerical.loc['Suburban']])
-        display_similar_tracks(df, suburban_mean, included_numerical_cols, included_non_numerical_cols, 'Suburban')
+    if st.button('Voorstedelijk baanvak in echte baanvakken'):
+        suburban_mean = pd.concat([mean_numerical.loc['Voorstedelijk'], mode_non_numerical.loc['Voorstedelijk']])
+        display_similar_tracks(df, suburban_mean, included_numerical_cols, included_non_numerical_cols, 'Voorstedelijk')
 
-    if st.button('Regional Track Section in Real tracks'):
-        regional_mean = pd.concat([mean_numerical.loc['Regional'], mode_non_numerical.loc['Regional']])
-        display_similar_tracks(df, regional_mean, included_numerical_cols, included_non_numerical_cols, 'Regional')
+    if st.button('Regionaal baanvak in echte baanvakken'):
+        regional_mean = pd.concat([mean_numerical.loc['Regionaal'], mode_non_numerical.loc['Regionaal']])
+        display_similar_tracks(df, regional_mean, included_numerical_cols, included_non_numerical_cols, 'Regionaal')
 
 
 
