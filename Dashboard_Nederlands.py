@@ -722,7 +722,7 @@ if '3D PCA' in graph_options or 'Taartdiagram' in graph_options:
                 ax.scatter(cluster_data['PC1'], cluster_data['PC2'], cluster_data['PC3'], 
                            label=f'Cluster {cluster}', s=50, alpha=0.6, color=colors[cluster])
 
-            ax.set_title('3D PCA of Clusters', fontsize=10)
+            ax.set_title('3D PCA van de Clusters', fontsize=10)
             ax.set_xlabel('PC1', fontsize=6)
             ax.set_ylabel('PC2', fontsize=6)
             ax.set_zlabel('PC3', fontsize=6)
