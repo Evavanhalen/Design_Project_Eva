@@ -107,7 +107,7 @@ with st.expander("🗺️ Klik hier om de kaart van de baanvakken te zien"):
 
 
 st.markdown("""
-    <h1 style='font-size:2.5em; color:navy;'>Filtering Section</h1>
+    <h1 style='font-size:2.5em; color:navy;'>Filteren op baanvak eigenschappen</h1>
     <hr style='border:2px solid navy;'>
     """, unsafe_allow_html=True)
 st.markdown("Met dit dashboard kan de gebruiker treinbaanvakken filteren op basis van de filteropties aan de linkerkant van het dashboard. De tabel laat zien welke baanvakken voldoen aan de gekozen criteria.")
@@ -353,7 +353,7 @@ st.markdown("""
 # Visualization Options
 st.subheader('Visualisatie Opties')
 graph_options = st.multiselect(
-    'Select the graphs you want to see:',
+    'Selecteer de grafieken die je wilt zien:',
     ['Numerieke Gemiddeldes per Categorie', 'Niet-Numerieke Modi per Categorie', 'Numerieke Samenvatting']
 )
 # Group by 'Urban/Regional/Suburban' and calculate mean and standard deviation for numerical features and most frequent value for non-numerical features
@@ -563,9 +563,9 @@ with col1:
         summary_non_numerical.to_excel(writer, sheet_name='Non-Numerical Features')
     output.seek(0)
     st.download_button(
-        label="Download Summary of Urban/Suburban/Regional Tracks to Excel",
+        label="Download Samenvatting van de Stedelijke/Voorstedelijke/Regionale Baanvakken naar Excel",
         data=output,
-        file_name="Categories_Summary.xlsx",
+        file_name="Categorieën_Samenvatting.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
@@ -610,29 +610,29 @@ def display_similar_tracks(df, mean_vector, numerical_cols, non_numerical_cols, 
     df.drop(columns=['Similarity'], inplace=True)
 
 st.markdown("""
-    <h1 style='font-size:2.5em; color:darkred;'>K-Clustering of Train Track Sections</h1>
+    <h1 style='font-size:2.5em; color:darkred;'>K-Clustering van Baanvakken</h1>
     <hr style='border:2px solid darkred;'>
     """, unsafe_allow_html=True)
-st.markdown("The k-means clustering algorithm is applied to the preprocessed data. K-means clustering aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster. The k-means algorithm minimizes the WCSS (Within-Cluster Sum of Square), also known as the inertia.")
+st.markdown("Het k-means clusteralgoritme wordt toegepast op de voorbewerkte gegevens. K-means clustering heeft als doel n observaties te verdelen in k clusters waarin elke observatie behoort tot het cluster met het dichtstbijzijnde gemiddelde, dat dient als prototype van het cluster. Het k-means algoritme minimaliseert de WCSS (Within-Cluster Sum of Square), ook bekend als de traagheid.")
 
-st.subheader('Visualization Options')
+st.subheader('Visualisatie Opties')
 graph_options = st.multiselect(
-    'Select the graphs you want to see:',
-    ['3D PCA', 'Pie Chart']
+    'Selecteer de grafieken die je wilt zien:',
+    ['3D PCA', 'Taartdiagram']
 )
 
 numerical_cols = [col for col, (include, _) in column_inclusion.items() if include and pd.api.types.is_numeric_dtype(df[col])]
 
 # After applying filters, check the number of samples
 if filtered_df.shape[0] == 0:
-    st.warning("No data available after applying filters. Please adjust the filters.")
+    st.warning("Geen gegevens beschikbaar na het toepassen van filters. Pas de filters aan.")
 else:
     # Define the number of clusters, k
     default_k = 5  # Default number of clusters
     k = min(default_k, filtered_df.shape[0])  # Set k to the default or the number of samples, whichever is smaller
     
     if filtered_df.shape[0] < k:
-        st.warning(f"Not enough data for {k} clusters. Only {filtered_df.shape[0]} samples available. Adjusting number of clusters to {filtered_df.shape[0]}.")
+        st.warning(f"Niet genoeg gegevens voor {k} clusters. Alleen {filtered_df.shape[0]} monsters beschikbaar. Aantal clusters aanpassen naaro {filtered_df.shape[0]}.")
         k = filtered_df.shape[0]
     
     # Ensure numerical_data is defined and valid
@@ -643,7 +643,7 @@ else:
 
     # Ensure there's no NaN or infinite values before scaling
     if np.isnan(numerical_data_array).any() or np.isinf(numerical_data_array).any():
-        st.error("Filtered data contains NaN or infinite values. Please check the data or adjust the filters.")
+        st.error("Gefilterde gegevens bevatten NaN of oneindige waarden. Controleer de gegevens of pas de filters aan.")
     else:
         # Impute missing values and scale the data
         imputer = SimpleImputer(strategy='mean')
@@ -674,35 +674,35 @@ else:
 
     
 # 3D PCA Plot and Pie Chart
-if '3D PCA' in graph_options or 'Pie Chart' in graph_options:
+if '3D PCA' in graph_options or 'Taartdiagram' in graph_options:
     col1, col2 = st.columns(2)
-    with st.expander("📖 Click here for an explanation of the visualizations"):
+    with st.expander("📖 Klik hier voor uitleg over de visualisaties"):
         st.markdown("""
-        ## Explanation of Visualizations
+## Uitleg van visualisaties
 
-        **3D PCA Plot**:
-        - This plot shows the clusters found in the data using k-means clustering.
-        - Each point represents a section of the train track.
-        - The three axes (PC1, PC2, PC3) are the first three principal components, which are new features created to summarize the data.
-        - Points that are close to each other are similar in terms of the selected features.
-        - Different colors represent different clusters.
+        **3D PCA-plot**:
+        - Deze plot toont de clusters die in de gegevens zijn gevonden met k-means clustering.
+        - Elk punt stelt een deel van het treinspoor voor.
+        - De drie assen (PC1, PC2, PC3) zijn de eerste drie principale componenten, die nieuwe kenmerken zijn om de gegevens samen te vatten.
+        - Punten die dicht bij elkaar liggen, lijken op elkaar wat betreft de geselecteerde kenmerken.
+        - Verschillende kleuren vertegenwoordigen verschillende clusters.
 
-        **Pie Chart**:
-        - This chart shows the distribution of the clusters.
-        - Each slice of the pie represents one cluster.
-        - The size of each slice shows how many sections of the train track belong to that cluster.
+        **Taartdiagram**:
+        - Deze grafiek toont de verdeling van de clusters.
+        - Elk taartpunt staat voor een cluster.
+        - De grootte van elk taartpunt geeft aan hoeveel delen van het treinspoor tot dat cluster behoren.
         """)
 
-    with st.expander("📖 Click here for an explanation of the k-clustering algorithm"):
+    with st.expander("📖 Klik hier voor een uitleg van het k-clusteralgoritme"):
         st.markdown("""
-        ## Explanation of the Clustering Algorithm
+ ## Uitleg van het clusteralgoritme
 
-        **K-Means Clustering**:
-        - The k-means clustering algorithm groups the data into clusters.
-        - Each data point is assigned to the nearest cluster center, called a centroid.
-        - The algorithm tries to minimize the distance between data points and their respective centroids.
-        - This way, data points within the same cluster are similar to each other.
-        - In this analysis, the algorithm has grouped the train track sections into 5 clusters.
+        **K-Means clustering**:
+        - Het k-means clusteralgoritme groepeert de gegevens in clusters.
+        - Elk gegevenspunt wordt toegewezen aan het dichtstbijzijnde clustermiddelpunt, een centroïde genoemd.
+        - Het algoritme probeert de afstand tussen gegevenspunten en hun respectieve centroïde te minimaliseren.
+        - Op deze manier lijken gegevenspunten binnen hetzelfde cluster op elkaar.
+        - In deze analyse heeft het algoritme de treinspoorsecties in 5 clusters gegroepeerd.
         """)
 
     if '3D PCA' in graph_options:
@@ -729,7 +729,7 @@ if '3D PCA' in graph_options or 'Pie Chart' in graph_options:
             ax.legend(fontsize=6)
             st.pyplot(fig)
 
-    if 'Pie Chart' in graph_options:
+    if 'Taartdiagram' in graph_options:
         with col2:
             cluster_counts = filtered_df['Cluster'].value_counts()
 
